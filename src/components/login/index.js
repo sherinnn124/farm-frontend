@@ -21,7 +21,8 @@ useEffect(() => {
         setWarning('')
         localStorage.setItem('token',res.data.items.token);
         loggedInUser(res.data.items);
-        navigate('home',{replace:true})
+        navigate('home');
+        window.location.reload();
     })
     .catch(e=>{
         setWarning('incorrect username or password')

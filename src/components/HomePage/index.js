@@ -6,13 +6,8 @@ function HomePage() {
 
   const user=useContext(userContext)
   useEffect(()=>{
-    const config={
-      headers:{
-        Authorization:'Bearer ' + localStorage.getItem('token')
-      }
-    }
     console.log(user)
-    axios.get('survay',config)
+    axios.get('survay')
     .then(res=>console.log(res))
     .catch(e=>console.log(e))
   },[])
