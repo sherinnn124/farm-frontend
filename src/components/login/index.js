@@ -20,8 +20,9 @@ useEffect(() => {
     .then(res=>{
         setWarning('')
         localStorage.setItem('token',res.data.items.token);
+        localStorage.setItem('user',JSON.stringify(res.data.items));
         loggedInUser(res.data.items);
-        navigate('home');
+        navigate('home')
         window.location.reload();
     })
     .catch(e=>{
