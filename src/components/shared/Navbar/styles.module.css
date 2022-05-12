@@ -1,0 +1,83 @@
+body {
+    font-family: 'Handlee','Red Hat Mono', monospace;
+    background-color: var(--background-color);
+  }
+  :root{
+    --background-color:#f1f5f8;
+    --transition:all linear 0.3s;
+    --navbar-color:#854884;
+  }
+  .navHeader{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .navHeader .toggler:hover,.rotateBlue{
+    transform: rotate(90deg);
+  }
+  .toggler{
+    background-color: transparent;
+    border-color: transparent;
+    font-size: 40px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: var(--transition);
+    color: white;
+  }
+  .nav{
+    max-width: 90%;
+    margin: 0 auto;
+    padding: 1rem;
+    color: white;
+  }
+  .navContainer{
+    background-color:var(--navbar-color);
+  }
+  .ul{
+    list-style-type: none;
+  } 
+  .social-links{
+    display: none;
+  }
+  .ul li{
+    margin: 0 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s linear;
+  }
+  .linksContainer{
+    overflow: hidden;
+    transition: var(--transition);
+  }
+  .links .li .a{
+    color: white;
+    text-transform: capitalize;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .logo{
+      width: 40px;
+      height: 40px;
+  }
+  .imageContainer{
+    display:flex ;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  @media (min-width:900px){
+    .nav{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .ul{
+      display: flex;
+    }
+    .toggler{
+      display: none;
+    }
+    .linksContainer{
+      height: auto !important;
+    }
+  }
