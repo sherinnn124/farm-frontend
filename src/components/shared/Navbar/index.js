@@ -1,9 +1,13 @@
 import logo from '../../../assets/logo.png';
 import { GiHamburgerMenu} from "react-icons/gi";
 import { useEffect, useRef, useState } from 'react';
-import {NavLink,Link} from 'react-router-dom'
+import {NavLink} from 'react-router-dom'
 import styles from './styles.module.css'
-function Navbar() {
+import authService from '../../../services/auth.service';
+
+
+
+function Navbar({}) {
   const[showLinks,setShowLinks]=useState(false)
   const linkContainerRef=useRef(null)
   const linksRef=useRef(null)
@@ -16,15 +20,16 @@ function Navbar() {
     console.log(height)
     if(showLinks){linkContainerRef.current.style.height=`${height}px`}
     else{linkContainerRef.current.style.height='0px'}
-    
   },[showLinks])
   const navLinkStyle=({isActive})=>{
       return {
           fontWeight:isActive?'bold':'normal'
       }
   }
+
+
   return (
-      <div className={styles.navContainer}>
+      <div className={styles.navContainer} >
         <nav className={styles.nav}>
             <div className={styles.navHeader}>
             <div className={styles.imageContainer}>
@@ -40,6 +45,7 @@ function Navbar() {
                     <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="home">Home</NavLink></li>
                     <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="farms">Farms</NavLink></li>
                     <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="survays">Survays</NavLink></li>
+                    <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="/" onClick={authService.logout}>Log Out</NavLink></li>
                 
                 </ul>
             </div>

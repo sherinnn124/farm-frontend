@@ -1,9 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import notfound from '../../assets/notfound.svg' 
+import styles from './styles.module.css'
 
-function NotFound() {
+
+function NotFound({navbar}) {
+  useEffect(()=>{
+    navbar.setNavbarHidden(true);
+
+    return ()=>{navbar.setNavbarHidden(false)}
+  })
   return (
-    <div>
-      Page Not Found
+    <div className={styles.container}>
+      <img src={notfound} alt="not found" className={styles.notFound} />
     </div>
   )
 }

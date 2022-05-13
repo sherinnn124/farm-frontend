@@ -4,10 +4,9 @@ import Login from './components/login';
 import HomePage from './components/HomePage'
 import {Route,Routes} from 'react-router-dom'
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
 import Navbar from './components/shared/Navbar';
 import NotFound from './components/NotFound';
-
 
 
 export const userContext=React.createContext();
@@ -15,13 +14,17 @@ export const userContext=React.createContext();
 function App() {
   const[user,setUser]=useState(undefined);
   const navigate=useNavigate()
-  const[navbarHidden,setNavBarHidden]=useState(true)
+  const[navbarHidden,setNavbarHidden]=useState(true)
+  const location = useLocation()
+
   useEffect(()=>{
     const currentUser=JSON.parse(localStorage.getItem('user'));
     if(currentUser){
       setUser(currentUser)
-      setNavBarHidden(false);
+      setNavbarHidden(false);
+      if(location.pathname=='/'){
       navigate('home')
+      }
     }
     else{
       navigate('/')
@@ -30,7 +33,7 @@ function App() {
 
   const loggedInUser=(user)=>{
     setUser(user);
-    setNavBarHidden(false);
+    setNavbarHidden(false);
   }
 
   return (
@@ -39,12 +42,9 @@ function App() {
       <Routes>
         <Route path='/' element={<Login loggedInUser={loggedInUser}/>}></Route>
         <Route path='home' element={<HomePage/>}></Route>
-        <Route path='*' element={<NotFound/>}></Route>
+        <Route path='*' element={<NotFound navbar={{navbarHidden,setNavbarHidden}}/>}></Route>
       </Routes>
     </userContext.Provider>
-    // <div className="App">
-    //   <Login/>
-    // </div>
   );
 }
 
