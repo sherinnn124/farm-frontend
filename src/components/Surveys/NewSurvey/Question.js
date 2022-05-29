@@ -4,13 +4,16 @@ import Select from 'react-select'
 import { IoCheckbox,IoCloseOutline} from "react-icons/io5";
 import { MdShortText,MdOutlineRadioButtonChecked} from "react-icons/md";
 import {BsToggleOff,BsToggleOn} from "react-icons/bs";
+import {useLocation} from 'react-router-dom'
 
 
-
-function Question({survey,questionIndex,setSurveyChange}) {
-    const [question,setQuestion]=useState({question:'Untitled Question',answers:[],answerType:'text',required:false,labeling:false});
+function Question({survey,questionData}) {
+    const {questionIndex} = questionData;
+    const [question,setQuestion]=useState(questionData.question);
+    const {id,setSurveyChange}=survey;
     const [selectedOption,setSelectedOption]=useState(null);
     const [arrayOptions,setArrayOptions]=useState(['']);
+    const location=useLocation();
     const options = [
         { value: 'text',
         label: (
@@ -52,6 +55,15 @@ function Question({survey,questionIndex,setSurveyChange}) {
             }
         }
     }
+    useEffect(()=>{
+        if(!id){
+            setArrayOptions([''])
+        }
+        else{
+            setArrayOptions(question.answers);
+            setSelectedOption(options.filter((option)=>option.value==question.answerType));
+        }
+    },[])
 
 
     const handleChange=(e,i)=>{
@@ -70,9 +82,12 @@ function Question({survey,questionIndex,setSurveyChange}) {
         }
     }
     const handleSelect=(e,answerType)=>{
-        setSelectedOption(e)
+        setSelectedOption(e);
         setQuestion({...question,[answerType]:e.value});
         setSurveyChange('answerType',e.value,questionIndex);
+        if((!question.answers.length)&&question.answerType!=='text'){
+            setArrayOptions([''])
+        }
     }
     const newOption=()=>{
         const array= [...arrayOptions];
@@ -116,12 +131,11 @@ function Question({survey,questionIndex,setSurveyChange}) {
                     </div>
                 )
                 }
-                else if(index==0&&question.answerType=='text'){
-                return(
-                    <input key={index}type={question.answerType} disabled name="" placeholder="Text answer" style={{height:'2rem',marginTop:'1rem'}}/>
-                )
-                }
             })
+            }
+            {
+                question.answerType=='text'&&
+                <input  type={question.answerType} disabled name="" placeholder="Text answer" style={{height:'2rem',marginTop:'1rem'}}/>
             }
             </div>
             <div style={{display:'flex',gap:'0.5rem',justifyContent:'center',marginTop:'1rem'}}>

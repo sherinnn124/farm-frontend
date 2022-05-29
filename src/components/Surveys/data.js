@@ -23,7 +23,7 @@ const surveys=[
         {
             question:'question three',
             answers:['option three','option four'],
-            answerType:'checkboxes',
+            answerType:'checkbox',
             required:false,
             labeling:true
         }

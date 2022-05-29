@@ -56,7 +56,7 @@ function App() {
         <Route path='surveys' element={<Surveys/>}></Route>
         <Route path='surveys/newSurvey' element={<NewSurvey/>}></Route>
         <Route path='labelers' element={<Labelers/>}></Route>
-        <Route path='surveys/edit/:id' element={<EditSurvey/>}></Route>
+        <Route path='surveys/edit/:id' element={<NewSurvey/>}></Route>
         <Route path='*' element={<NotFound navbar={{navbarHidden,setNavbarHidden}}/>}></Route>
       </Routes>
     </userContext.Provider>

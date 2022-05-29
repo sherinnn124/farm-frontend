@@ -1,11 +1,20 @@
-import React,{useState} from 'react'
+import React,{useEffect, useState} from 'react'
 import Question from './Question'
 import styles from './styles.module.css'
 import { IoArrowDown,IoSend } from "react-icons/io5";
-
+import { useLocation,useParams } from 'react-router-dom';
+import data from '../data'
 function NewSurvey() {
     const[questionsNumber,setQuestionsNumber]=useState(1);
-    const[survey,setSurvey]=useState({surveyTitle:'Untitled survey',surveyDescription:'',questions:[{question:'Untitled Question',answers:[],answerType:'text',required:false,labeling:false}]})
+    const[survey,setSurvey]=useState(null);
+    const location = useLocation();
+    const {id}=useParams();
+
+
+
+
+
+
     const handleChange=(e)=>{
         const{name,value}=e.target;
         setSurvey({...survey,[name]:value})
@@ -31,23 +40,35 @@ function NewSurvey() {
     const sendSurvey=()=>{
 
     }
+    useEffect(()=>{
+        if(!id){
+            setSurvey({surveyTitle:'Untitled survey',surveyDescription:'',questions:[{question:'Untitled Question',answers:[],answerType:'text',required:false,labeling:false}]});
+        }
+        else{
+            setSurvey(data[0]);
+        }
+    },[])
   return (
     <div style={{marginBottom:'3rem'}}>
+        { survey&&
+        <>
         <div className={`${styles.surveyInfo} ${styles.container}`}>
             <input type="text" onChange={handleChange} value={survey.surveyTitle} name="surveyTitle" style={{fontSize:'2rem'}}/>
-            <textarea placeholder="survey description" name="surveyDescription" onChange={handleChange} id="surveyDescription"   onKeyUp={()=>setHeight('surveyDescription')} onKeyDown={()=>setHeight('surveyDescription')}></textarea>
+            <textarea placeholder="survey description" name="surveyDescription" onChange={handleChange} id="surveyDescription" value={survey.surveyDescription}  onKeyUp={()=>setHeight('surveyDescription')} onKeyDown={()=>setHeight('surveyDescription')}></textarea>
         </div>
             {
-                [...Array(questionsNumber)].map((question,index)=>{
+                survey.questions.map((question,index)=>{
                     return(
-                        <Question key={index} survey={{survey,setSurvey}} questionIndex={index} setSurveyChange={setSurveyChange}/>
+                        <Question key={index} questionData={{question,questionIndex:index}} survey={{survey,setSurvey,setSurveyChange,id}} />
                     )
                 })
             }
             <div style={{textAlign:'center'}}>
                 <button className='btn' style={{marginRight:'1rem'}} onClick={newQuestion}><IoArrowDown/> Add question</button>
-                <button className='btn'  onClick={sendSurvey}><IoSend/> Send survey</button>
+                <button className='btn'  onClick={sendSurvey}><IoSend/> {!id?'Send':'Edit'} survey</button>
             </div>
+        </>
+        }
     </div>
   )
 }
