@@ -1,0 +1,65 @@
+.modalOverlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.5);
+    visibility: hidden;
+    z-index: -1;
+    transition: var(--transition);
+}
+.showModal{
+    visibility: visible;
+    z-index: 1
+}
+.modalContainer{
+    background-color: white;
+    border-radius: 0.25rem;
+    padding: 2rem;
+    width: 90vw;
+    max-width: 400px;
+    position: relative;
+}
+.newLabeler{
+    font-weight: bold;
+    border-bottom: var(--secondary) 1px solid;
+    margin-bottom: 2rem;
+    color: var(--main-color);
+    text-align: center;
+    padding-bottom: 0.5rem;
+}
+.inputsContainer div>div{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+
+}
+.inputsContainer >div{
+    margin-bottom: 2rem;
+}
+.inputsContainer input{
+    border-color: transparent;
+    width: 100%;
+    padding: 0.5rem;
+    outline: none;
+    border-bottom: 1px solid var(--secondary);
+    transition: var(--transition);
+}
+.inputsContainer input:focus{
+    border-bottom: 2px  solid var(--main-color);
+}
+.closeModal{
+    color: var(--danger);
+    font-size: 2.5rem;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    cursor: pointer;
+    border-color: transparent;
+    background-color: transparent;
+}

@@ -1,12 +1,3 @@
-body {
-    font-family: 'Handlee','Red Hat Mono', monospace;
-    background-color: var(--background-color);
-  }
-  :root{
-    --background-color:#f1f5f8;
-    --transition:all linear 0.3s;
-    --navbar-color:#854884;
-  }
   .navHeader{
     display: flex;
     justify-content: space-between;
@@ -32,7 +23,7 @@ body {
     color: white;
   }
   .navContainer{
-    background-color:var(--navbar-color);
+    background-color:var(--main-color);
   }
   .ul{
     list-style-type: none;

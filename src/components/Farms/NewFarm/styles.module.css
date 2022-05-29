@@ -1,0 +1,21 @@
+.selectFarmContainer{
+    display: flex;
+    justify-content: center;
+}
+.select{
+    border: solid 2px var(--main-color);
+    border-radius: 0.25rem;
+    font-family: var(--main-font)
+}
+.newFarmHeading{
+    text-align: center;
+    margin: 3rem 0;
+    color: var(--main-color);
+}
+.btn{
+    display: block;
+    margin: 2rem auto 0 auto;
+}
+.action{
+    color: var(--farm-btn);
+}
