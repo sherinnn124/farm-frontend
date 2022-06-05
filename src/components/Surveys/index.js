@@ -6,7 +6,7 @@ import { FaEdit,FaTrash} from "react-icons/fa";
 import data from './data'
 function Surveys() {
     //data should come from backend
-    const[surveysData,setSurveysData]=useState(data);
+    const[surveysData,setSurveysData]=useState([]);
     const navigate=useNavigate();
     
 
@@ -35,12 +35,11 @@ function Surveys() {
         // delete route
     }
 
-    //API call to fetch farm data-->
-    // useEffect(()=>{
-    //     axios.get()
-    //     .then(res=>setFarmsData(res.data))
-    //     .catch(e=>console.log(e))
-    // })
+    useEffect(()=>{
+        axios.get('survay')
+        .then(response=>setSurveysData(response.data.items))
+        .catch(e=>console.log(e))
+    })
 
   return (
     <div className='container'>
@@ -53,7 +52,7 @@ function Surveys() {
                     <th>ID</th>
                     <th>Title</th>
                     <th>Tree Type</th>
-                    <th>Questions Number</th>
+                    <th>Description</th>
                     <th>Updated</th>
                     <th>Actions</th>
                 </tr>
@@ -65,9 +64,9 @@ function Surveys() {
                     return(
                     <tr key={survey.id}>
                         <td>{survey.id}</td>
-                        <td>{survey.surveyTitle}</td>
-                        <td>{survey.treeType}</td>
-                        <td>{survey.questions.length}</td>
+                        <td>{survey.title}</td>
+                        <td>{survey.treeTypeDesc}</td>
+                        <td>{survey.description}</td>
                         <td>{survey.updated}</td>
                         <td style={{display:"flex"}}>
                             <button className='edit action' style={{fontSize:'1rem'}} onClick={()=>navigate(`edit/${survey.id}`,{state:{survey:survey}})}><FaEdit/></button>

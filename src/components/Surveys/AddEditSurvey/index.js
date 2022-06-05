@@ -7,7 +7,6 @@ import data from '../data'
 function NewSurvey() {
     const[questionsNumber,setQuestionsNumber]=useState(1);
     const[survey,setSurvey]=useState(null);
-    const location = useLocation();
     const {id}=useParams();
 
 
@@ -59,7 +58,7 @@ function NewSurvey() {
             {
                 survey.questions.map((question,index)=>{
                     return(
-                        <Question key={index} questionData={{question,questionIndex:index}} survey={{survey,setSurvey,setSurveyChange,id}} />
+                        <Question key={index} questionData={{question,questionIndex:index}} surveyData={{survey,setSurvey,setSurveyChange,id}} />
                     )
                 })
             }

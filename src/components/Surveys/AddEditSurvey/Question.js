@@ -4,16 +4,14 @@ import Select from 'react-select'
 import { IoCheckbox,IoCloseOutline} from "react-icons/io5";
 import { MdShortText,MdOutlineRadioButtonChecked} from "react-icons/md";
 import {BsToggleOff,BsToggleOn} from "react-icons/bs";
-import {useLocation} from 'react-router-dom'
+import {customStyles,customTheme} from '../../../services/service'
 
-
-function Question({survey,questionData}) {
+function Question({surveyData,questionData}) {
     const {questionIndex} = questionData;
     const [question,setQuestion]=useState(questionData.question);
-    const {id,setSurveyChange}=survey;
+    const {id,setSurveyChange,survey,setSurvey}=surveyData;
     const [selectedOption,setSelectedOption]=useState(null);
     const [arrayOptions,setArrayOptions]=useState(['']);
-    const location=useLocation();
     const options = [
         { value: 'text',
         label: (
@@ -34,27 +32,6 @@ function Question({survey,questionData}) {
             </div>
         ) },
     ];
-
-
-
-
-
-    const customStyles = {
-        option:(provided,state)=>({
-            ...provided,
-            color:state.isSelected?'white':'black'
-        })
-    }
-    const customTheme=(theme)=>{
-        return {
-            ...theme,
-            colors:{
-                ...theme.colors,
-                primary:'var(--main-color)',
-                primary25:'var(--input-border-bottom)'
-            }
-        }
-    }
     useEffect(()=>{
         if(!id){
             setArrayOptions([''])
@@ -85,10 +62,19 @@ function Question({survey,questionData}) {
         setSelectedOption(e);
         setQuestion({...question,[answerType]:e.value});
         setSurveyChange('answerType',e.value,questionIndex);
-        if((!question.answers.length)&&question.answerType!=='text'){
+    }
+
+    useEffect(()=>{
+        if(question.answerType!="text"&&question.answers.length=="0"){
             setArrayOptions([''])
         }
-    }
+        else if(question.answers.length&&question.answerType=="text"){
+            setSurveyChange('answers',[],questionIndex);
+            setArrayOptions([''])
+        }
+    },[question.answerType])
+
+
     const newOption=()=>{
         const array= [...arrayOptions];
         array.push('');

@@ -107,14 +107,14 @@ function NewFarm() {
                         <tr>
                             <th>FarmID</th>
                             <th>Total Number Of Trees</th>
-                            <th>Total Number Of Trees</th>
+                            {/* <th>Total Number Of Images</th> */}
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>{newFarm.id}</td>
                             <td>{newFarm.treesNumber}</td>
-                            <td>{newFarm.imagesNumber}</td>
+                            {/* <td>{newFarm.imagesNumber}</td> */}
                         </tr>
                     </tbody>
                 </table>
@@ -129,7 +129,6 @@ function NewFarm() {
                                 <tr>
                                     <th>Tree Type</th>
                                     <th>Trees</th>
-                                    <th>Images</th>
                                     <th>Survey</th>
                                     <th>Labeler</th>
                                     <th>Progress</th>
@@ -146,7 +145,6 @@ function NewFarm() {
                                     <tr>
                                         <td>{type}</td>
                                         <td>{treesNumber}</td>
-                                        <td>{imagesNumber}</td>
                                         <td>-</td>
                                         <td>-</td>
                                         <td>Progress</td>
@@ -167,7 +165,7 @@ function NewFarm() {
                                                 <tr key={i}>
                                                     <td></td>
                                                     <td><input type="number" name={Object.keys(newlabelerSurvey)[2]} value={labelersSurvey[index][i].treesNumber} onChange={assignInput} /></td>
-                                                    <td><input type="number" name={Object.keys(newlabelerSurvey)[3]} value={labelersSurvey[index][i].imagesNumber} onChange={assignInput} /></td>
+                                                    {/* <td><input type="number" name={Object.keys(newlabelerSurvey)[3]} value={labelersSurvey[index][i].imagesNumber} onChange={assignInput} /></td> */}
                                                     <td>
                                                         <select name={Object.keys(newlabelerSurvey)[1]} id="surveys" onChange={assignInput} defaultValue={"default"}>
                                                         <option value={"default"} disabled hidden>Select survey</option>
@@ -181,7 +179,7 @@ function NewFarm() {
                                                     </td>
                                                     <td>
                                                         <select name={Object.keys(newlabelerSurvey)[0]} id="labelers" onChange={assignInput} defaultValue={"default"}>
-                                                        <option value={"default"} disabled hidden>Select survey</option>
+                                                        <option value={"default"} disabled hidden>Select Labeler</option>
                                                         {
                                                         labelers.map((labeler,i)=>{
                                                             return <option key={labeler.id} value={labeler.id}>{labeler.id}</option>

@@ -1,0 +1,14 @@
+.labelContainer{
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+.navImages{
+  background-color: transparent;
+  border-color: transparent;
+  font-size: 3rem;
+  cursor: pointer;
+  color: var(--main-color);
+}

@@ -3,7 +3,8 @@ import { GiHamburgerMenu} from "react-icons/gi";
 import { useEffect, useRef, useState } from 'react';
 import {NavLink} from 'react-router-dom'
 import styles from './styles.module.css'
-import {logout} from '../../../services/service';
+// import {logout} from '../../../services/service';
+import axios from 'axios';
 
 
 
@@ -11,6 +12,7 @@ function Navbar({}) {
   const[showLinks,setShowLinks]=useState(false)
   const linkContainerRef=useRef(null)
   const linksRef=useRef(null)
+  const[logout,setLogout]=useState(false)
 
   const display=()=>{
     setShowLinks(!showLinks)
@@ -25,7 +27,28 @@ function Navbar({}) {
           fontWeight:isActive?'bold':'normal'
       }
   }
+  const logoutNow=()=>{
+    axios.get("token/logout")
+    .then(res=>console.log("success"))
+    .catch(e=>console.log('failed'))
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    window.location.reload();
 
+  }
+  useEffect(()=>{
+    if(logout==true){
+      axios.get("token/logout")
+      .then(res=>{
+        console.log(res)
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        window.location.reload();
+        setLogout("false")
+      })
+      .catch(e=>console.log('failed'))
+    }
+  },[logout])
 
   return (
       <div className={styles.navContainer} >
@@ -45,8 +68,8 @@ function Navbar({}) {
                     <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="labelers">Labelers</NavLink></li>
                     <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="surveys">Surveys</NavLink></li>
                     <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="farms">Farms</NavLink></li>
-                    <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="/" onClick={()=>logout()}>Log Out</NavLink></li>
-                
+                    <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="/" onClick={()=>setLogout(true)}>Log Out</NavLink></li>
+
                 </ul>
             </div>
         </nav>

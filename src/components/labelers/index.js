@@ -2,73 +2,101 @@ import React, { useEffect } from 'react'
 import { FaEdit,FaTrash} from "react-icons/fa";
 import { useNavigate} from 'react-router-dom';
 import { useState } from 'react'
-import data from './data'
 import styles from './styles.module.css'
 import { IoCheckmarkDone } from "react-icons/io5";
-import { MdEmail,MdClose} from "react-icons/md";
-import {updated} from '../../services/service'
+import { MdEmail,MdClose,MdLabelOutline} from "react-icons/md";
+import {GrUserAdmin} from 'react-icons/gr'
+import Select from 'react-select'
 import validator from 'validator'
 import axios from 'axios';
-
+import {customStyles,customTheme} from '../../services/service'
 
 
 
 function Labelers() {
-//   const[labelersData,setlabelersData]=useState([]);
-    const[labelersData,setlabelersData]=useState(data);
+    const[usersData,setUsersData]=useState([]);
     const [isLabelerModalOpen,setIsLabelerModalOpen]=useState(false);
-    const [newLabeler,setNewLabeler]=useState({email:'',updated:''});
+    const [newLabeler,setNewLabeler]=useState({email:'',usrRoleId:''});
     const [isSubmitted,setIsSubmitted]=useState(false);
     const navigate=useNavigate();
-    const [formErrors,setFormErrors]=useState({})
-    const  [showAlert,setShowAlert]=useState(false)
+    const [formErrors,setFormErrors]=useState({});
+    const [showAlert,setShowAlert]=useState(false);
+    const [selectedRole,setSelectedRole]=useState(null)
+    
+    const options=[
+        {
+            value:1,
+            label:(
+                <div>
+                    <GrUserAdmin/> Admin
+                </div>
+            )
+        },
+        {
+            value:2,
+            label:(
+                <div>
+                    <MdLabelOutline/> Labeler
+                </div>
+            )
+        }
+    ]
 
+    useEffect(()=>{
+        axios.get('user')
+        .then(response=>setUsersData(response.data.items))
+        .catch(error=>console.log(error))
+    },[])
     const handleChange=(e)=>{
         const {value,name}=e.target;
         setNewLabeler({...newLabeler,[name]:value});
     }
-    const SubmitLabeler=()=>{
-        const updatedd=updated();
-        setNewLabeler({...newLabeler,updated:updatedd})
-        setFormErrors(validate(newLabeler));
-        setIsSubmitted(true);
-        // if(isSubmitted&&Object.keys(formErrors).length==0){
-        //     setNewLabeler({updated:'',email:''});
-        //     setShowAlert(true);
-        //     axios.post('',newLabeler)
-        //     .then(res=>{
-        //         setIsLabelerModalOpen(false);
-        //         setIsSubmitted(false);
-        //         setNewLabeler({name:'',email:'',mobileNumber:'',updated:''});
-        //     })
-        //     .catch(error=>console.log(error))
-        //}
+    const handleSelectRole=(event)=>{
+        setSelectedRole(event);
+        setNewLabeler({...newLabeler,usrRoleId:event.value});
+        console.log(newLabeler)
+        console.log(event.value)
     }
     useEffect(()=>{
         if(isSubmitted&&Object.keys(formErrors).length==0){
-            setNewLabeler({updated:'',email:''});
-            setShowAlert(true);
+            axios.post('user/inviteUserWithRole',newLabeler)
+            .then(response=>{
+                setShowAlert(true);
+                setIsSubmitted(false);
+                setNewLabeler({email:'',usrRoleId:''});
+                setSelectedRole(null)
+            })
+            .catch(error=>{
+                console.log(error);
+                setIsSubmitted(false)
+            })
         }
-        setIsSubmitted(false);
-    },[isSubmitted])
-    const validate=(newLabeler)=>{
-        const errors={};
-        // if(!newLabeler.name)errors.name='Name is required'
-        if(!validator.isEmail(newLabeler.email))errors.email='A valid email is required'
-        // if(!newLabeler.mobileNumber)errors.mobileNumber='Number is required'
+        else{
+            setIsSubmitted(false)
+        }
+        }
+    ,[formErrors])
 
-        return errors
+    const validate=()=>{
+        const errors={};
+        if(!validator.isEmail(newLabeler.email)){errors.email='A valid email is required'}
+        if(newLabeler.usrRoleId==''){errors.role="Select user role"}
+        setIsSubmitted(true);
+        setFormErrors(errors);
+        
     }
     const removelabeler=(id)=>{
-    setlabelersData((previouslabelers)=>previouslabelers.filter((labeler)=>labeler.id!=id));
+    setUsersData((previouslabelers)=>previouslabelers.filter((labeler)=>labeler.id!=id));
 
       // delete route
     }
     useEffect(()=>{
+        if(showAlert){
         const timeOut=setTimeout(() => {
             setShowAlert(false)
         },3000);
         return ()=>clearInterval(timeOut)
+    }
     },[showAlert])
     return (
     <>
@@ -89,20 +117,20 @@ function Labelers() {
                 </tr>
             </thead>
             <tbody>
-            {labelersData.length==0?
+            {usersData.length==0?
             <tr><td colSpan="7">No labelers Yet</td></tr>:
-                labelersData.map((labeler)=>{
+                usersData.map((userData)=>{
                     return(
-                    <tr key={labeler.id}>
-                        <td>{labeler.id}</td>
-                        <td>{labeler.name}</td>
-                        <td>{labeler.email}</td>
-                        <td>{labeler.phone}</td>
-                        <td>{labeler.labels}</td>
-                        <td>{labeler.updated}</td>
+                    <tr key={userData.ud}>
+                        <td>{userData.ud}</td>
+                        <td>{userData.name}</td>
+                        <td>{userData.email}</td>
+                        <td>{userData.mobile}</td>
+                        <td>{userData.labels}</td>
+                        <td>{userData.updated}</td>
                         <td style={{display:"flex"}}>
-                            <button className='edit action' style={{fontSize:'1rem'}} onClick={()=>navigate(`edit/${labeler.id}`,{state:{labeler:labeler}})}><FaEdit/></button>
-                            <button className='remove action' style={{fontSize:'1rem'}} onClick={()=>removelabeler(labeler.id)}><FaTrash/></button>
+                            <button className='edit action' style={{fontSize:'1rem'}} onClick={()=>navigate(`edit/${userData.id}`,{state:{userData:userData}})}><FaEdit/></button>
+                            <button className='remove action' style={{fontSize:'1rem'}} onClick={()=>removelabeler(userData.id)}><FaTrash/></button>
                         </td>
                     </tr>
                     )
@@ -125,8 +153,12 @@ function Labelers() {
                         </div>
                         {formErrors.email&&<p style={{color:'var(--danger)',textAlign:'center',marginTop:'0.5rem'}}>{formErrors.email}</p>}
                     </div>
+                    <div>
+                        <Select isSearchable={false} styles={customStyles} theme={customTheme} options={options} placeholder={"Select Role..."} value={selectedRole} onChange={handleSelectRole}></Select>
+                        {formErrors.role&&<p style={{color:'var(--danger)',textAlign:'center',marginTop:'0.5rem'}}>{formErrors.role}</p>}
+                    </div>
                 </div>
-                <button className='btn' style={{display:'block',margin:'0 auto',fontSize:'1rem'}} type='button' onClick={SubmitLabeler}>Invite</button>
+                <button className='btn' style={{display:'block',margin:'0 auto',fontSize:'1rem'}} type='button' onClick={validate}>Invite</button>
             </div>
     </div>
     {showAlert&&

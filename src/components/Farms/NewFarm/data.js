@@ -2,27 +2,23 @@ const farms=[
     {
         id:1,
         treesNumber:2,
-        imagesNumber:10,
         updated:"",
         trees:[
             {   
                 id:1,
                 type:"mango",
                 treesNumber:1,
-                imagesNumber:5
             },
             {
                 id:2,
                 type:"palm",
                 treesNumber:1,
-                imagesNumber:5
             }
         ]
     },
     {
         id:2,
         treesNumber:3,
-        imagesNumber:10,
         updated:"",
         trees:[
             {   

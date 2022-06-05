@@ -12,8 +12,9 @@ import NewFarm from './components/Farms/NewFarm/NewFarm';
 import EditFarm from './components/Farms/EditFarm';
 import Surveys from './components/Surveys'
 import Labelers from './components/labelers';
-import NewSurvey from './components/Surveys/NewSurvey';
-import EditSurvey from './components/Surveys/EditSurvey';
+import NewSurvey from './components/Surveys/AddEditSurvey';
+import AnswerLabelSurvey from './components/AnswerLabelSurvey';
+
 
 
 
@@ -58,6 +59,7 @@ function App() {
         <Route path='labelers' element={<Labelers/>}></Route>
         <Route path='surveys/edit/:id' element={<NewSurvey/>}></Route>
         <Route path='*' element={<NotFound navbar={{navbarHidden,setNavbarHidden}}/>}></Route>
+        <Route path='AnswerLabelSurvey/:id' element={<AnswerLabelSurvey/>}></Route>
       </Routes>
     </userContext.Provider>
   );
