@@ -1,17 +1,19 @@
-import React,{useEffect, useState} from 'react'
+import React,{useEffect, useState,useRef} from 'react'
 import styles from './styles.module.css'
 import Select from 'react-select'
-import { IoCheckbox,IoCloseOutline} from "react-icons/io5";
+import { IoCheckbox,IoCloseOutline,IoRefresh} from "react-icons/io5";
 import { MdShortText,MdOutlineRadioButtonChecked} from "react-icons/md";
 import {BsToggleOff,BsToggleOn} from "react-icons/bs";
-import {customStyles,customTheme} from '../../../services/service'
-
+import {FaCircle} from "react-icons/fa";
+import {customStyles,customTheme, generateColor} from '../../../services/service'
+// import {generateColor} from '../../../services/service'
 function Question({surveyData,questionData}) {
     const {questionIndex} = questionData;
     const [question,setQuestion]=useState(questionData.question);
     const {id,setSurveyChange,survey,setSurvey}=surveyData;
     const [selectedOption,setSelectedOption]=useState(null);
     const [arrayOptions,setArrayOptions]=useState(['']);
+    console.log(question.color)
     const options = [
         { value: 'text',
         label: (
@@ -63,6 +65,11 @@ function Question({surveyData,questionData}) {
         setQuestion({...question,[answerType]:e.value});
         setSurveyChange('answerType',e.value,questionIndex);
     }
+    const changeColor=()=>{
+        let color=generateColor();
+        setQuestion({...question,color:color});
+        setSurveyChange('color',color,questionIndex)
+    }
 
     useEffect(()=>{
         if(question.answerType!="text"&&question.answers.length=="0"){
@@ -73,7 +80,24 @@ function Question({surveyData,questionData}) {
             setArrayOptions([''])
         }
     },[question.answerType])
-
+    
+    const isInitialMount = useRef(true);
+    useEffect(()=>{
+    if (isInitialMount.current) {
+            isInitialMount.current = false;
+    } 
+    else {
+        if(question.labeling){
+            const color=generateColor()
+            setQuestion({...question,color:color});
+            setSurveyChange('color',color,questionIndex);
+        }
+        else{
+            setQuestion({...question,color:''});
+            setSurveyChange('color','',questionIndex);
+        }
+    }
+    },[question.labeling])
 
     const newOption=()=>{
         const array= [...arrayOptions];
@@ -124,16 +148,29 @@ function Question({surveyData,questionData}) {
                 <input  type={question.answerType} disabled name="" placeholder="Text answer" style={{height:'2rem',marginTop:'1rem'}}/>
             }
             </div>
-            <div style={{display:'flex',gap:'0.5rem',justifyContent:'center',marginTop:'1rem'}}>
-                <div style={{display:'flex',gap:'0.5rem'}}>
-                    <span>Required</span>
-                    <button className='action' value={question.required} onClick={()=>toggleRequirement('required')}>{!question.required?<BsToggleOff/>:<BsToggleOn/>}</button>
-                </div>
-                <div style={{display:'flex',gap:'0.5rem'}}>
-                    <span>Labeling</span>
-                    <button className='action' value={question.labeling} onClick={()=>toggleRequirement('labeling')}>{!question.labeling?<BsToggleOff/>:<BsToggleOn/>}</button>
-                </div>
+            <div>
+                <div style={{display:'flex',gap:'0.5rem',justifyContent:'center',marginTop:'1rem'}}>
+                    <div style={{display:'flex',gap:'0.5rem'}}>
+                        <span>Required</span>
+                        <button className='action' value={question.required} onClick={()=>toggleRequirement('required')}>{!question.required?<BsToggleOff/>:<BsToggleOn/>}</button>
+                    </div>
+                    <div style={{display:'flex',gap:'0.5rem'}}>
+                        <span>Labeling</span>
+                        <button className='action' value={question.labeling} onClick={()=>toggleRequirement('labeling')}>{!question.labeling?<BsToggleOff/>:<BsToggleOn/>}</button>
+                    </div>
                 
+                </div>
+                {question.labeling &&
+                    <div style={{display:'flex',gap:'0.5rem',alignItems:'center'}}>
+                    Labeling Color :
+                    <div style={{color:`#${question.color}`}}>
+                        <FaCircle/>
+                    </div>
+                    <button style={{cursor:'pointer',fontSize:'1.25rem'}} className='action' onClick={changeColor}>
+                        <IoRefresh/>
+                    </button>
+                </div>
+                }
             </div>
         </div>
     </>

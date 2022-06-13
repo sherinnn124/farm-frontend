@@ -29,5 +29,15 @@ const customTheme=(theme)=>{
     }
 }
 
+const generateColor = () =>{
+    let color = Math.random().toString(16).substr(-6);
+    return color
+  //   let newColors=[];
+  //   for(let i=0;i<survey.surveyResult.length;i++){
+  //     colors.push(Math.random().toString(16).substr(-6))
+  //   }
+  // setColors(newColors)
+};
 
-export {logout,updated,customStyles,customTheme}
+
+export {logout,updated,customStyles,customTheme,generateColor}

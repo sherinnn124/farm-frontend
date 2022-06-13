@@ -31,7 +31,7 @@ function App() {
     if(currentUser){
       setUser(currentUser)
       setNavbarHidden(false);
-      if(location.pathname=='/'){
+      if(location.pathname==='/'){
       navigate('home')
       }
     }

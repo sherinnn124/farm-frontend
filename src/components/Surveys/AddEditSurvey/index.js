@@ -4,6 +4,7 @@ import styles from './styles.module.css'
 import { IoArrowDown,IoSend } from "react-icons/io5";
 import { useLocation,useParams } from 'react-router-dom';
 import data from '../data'
+import {generateColor} from '../../../services/service'
 function NewSurvey() {
     const[questionsNumber,setQuestionsNumber]=useState(1);
     const[survey,setSurvey]=useState(null);
@@ -41,7 +42,7 @@ function NewSurvey() {
     }
     useEffect(()=>{
         if(!id){
-            setSurvey({surveyTitle:'Untitled survey',surveyDescription:'',questions:[{question:'Untitled Question',answers:[],answerType:'text',required:false,labeling:false}]});
+            setSurvey({surveyTitle:'Untitled survey',surveyDescription:'',questions:[{question:'Untitled Question',answers:[],answerType:'text',required:false,labeling:false,color:generateColor()}]});
         }
         else{
             setSurvey(data[0]);

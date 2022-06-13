@@ -1,3 +1,66 @@
 .container{
-  display:flex
+  margin: 3rem auto;
+  border-spacing: 0;
+}
+.labelTd{
+  display:flex;
+  justify-content:center;
+  position: relative;
+}
+.answerTd{
+  background-color:white;
+  border-right: 2px solid var(--main-color);
+  max-width: 200px;
+}
+.nav{
+  background-color: transparent;
+  border-color: transparent;
+  font-size: 3rem;
+  cursor: pointer;
+  color: var(--main-color);
+}
+.table{
+  border-collapse: separate !important;
+  border: 2px solid var(--main-color);
+  border-spacing: 0;
+  text-align: center;
+}
+.progressBar{
+  width:400px;
+  height:3em;
+  background-color: white;
+  border-radius: 1.5em;
+  margin: 0 auto;
+  position: relative;
+}
+.progressBar::before{
+  content:'';
+  position: absolute;
+  height: 2em;
+  top:50%;
+  left: 0.5em;
+  transform: translateY(-50%);
+  background-color: var(--success);
+  width: calc(var(--progressWidth,0)*100%);
+  max-width: calc(100% - 1em);
+  border-radius: 1em;
+  transition: var(--transition);
+}
+.progressSubmitContainer{
+  margin:0 auto;
+  display:flex;
+  justify-content:space-between;
+  padding-right:2rem;
+}
+.previous,.next{
+  position: absolute;
+  top:50%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+.previous{
+  left: 0;
+}
+.next{
+  right: 0;
 }
