@@ -8,6 +8,7 @@ import {generateColor} from '../../../services/service'
 function NewSurvey() {
     const[questionsNumber,setQuestionsNumber]=useState(1);
     const[survey,setSurvey]=useState(null);
+    const[generatedColors,setGeneratedColors]=useState([])
     const {id}=useParams();
 
 
@@ -42,7 +43,7 @@ function NewSurvey() {
     }
     useEffect(()=>{
         if(!id){
-            setSurvey({surveyTitle:'Untitled survey',surveyDescription:'',questions:[{question:'Untitled Question',answers:[],answerType:'text',required:false,labeling:false,color:generateColor()}]});
+            setSurvey({surveyTitle:'Untitled survey',surveyDescription:'',questions:[{question:'Untitled Question',answers:[],answerType:'text',required:false,labeling:false,color:''}]});
         }
         else{
             setSurvey(data[0]);
@@ -59,7 +60,7 @@ function NewSurvey() {
             {
                 survey.questions.map((question,index)=>{
                     return(
-                        <Question key={index} questionData={{question,questionIndex:index}} surveyData={{survey,setSurvey,setSurveyChange,id}} />
+                        <Question key={index} questionData={{question,questionIndex:index}} colors={{generatedColors,setGeneratedColors}} surveyData={{survey,setSurvey,setSurveyChange,id}} />
                     )
                 })
             }

@@ -6,14 +6,13 @@ import { MdShortText,MdOutlineRadioButtonChecked} from "react-icons/md";
 import {BsToggleOff,BsToggleOn} from "react-icons/bs";
 import {FaCircle} from "react-icons/fa";
 import {customStyles,customTheme, generateColor} from '../../../services/service'
-// import {generateColor} from '../../../services/service'
-function Question({surveyData,questionData}) {
+function Question({surveyData,questionData,colors}) {
     const {questionIndex} = questionData;
     const [question,setQuestion]=useState(questionData.question);
     const {id,setSurveyChange,survey,setSurvey}=surveyData;
     const [selectedOption,setSelectedOption]=useState(null);
     const [arrayOptions,setArrayOptions]=useState(['']);
-    console.log(question.color)
+    // const {generatedColors,setGeneratedColors}=colors;
     const options = [
         { value: 'text',
         label: (
@@ -67,9 +66,28 @@ function Question({surveyData,questionData}) {
     }
     const changeColor=()=>{
         let color=generateColor();
+        const isRepeated=colors.generatedColors.some((generatedColor)=>generatedColor===color);
+        if(isRepeated){console.log("repeated");changeColor()}
+        else{
         setQuestion({...question,color:color});
-        setSurveyChange('color',color,questionIndex)
+        setSurveyChange('color',color,questionIndex);
+        const colorsHolder=[...colors.generatedColors];
+        colorsHolder[questionIndex]=color;
+        colors.setGeneratedColors(colorsHolder);
+        }
     }
+    useEffect(()=>{
+        if(question.labeling){
+        let color=generateColor();
+        const isRepeated=colors.generatedColors.some((generatedColor)=>generatedColor===color);
+        if(isRepeated){console.log("repeated");changeColor()}
+        else{
+        setQuestion({...question,color:color});
+        setSurveyChange('color',color,questionIndex);
+        colors.setGeneratedColors([...colors.generatedColors,color]);
+        }
+        }
+    },[question.labeling])
 
     useEffect(()=>{
         if(question.answerType!="text"&&question.answers.length=="0"){
@@ -81,23 +99,23 @@ function Question({surveyData,questionData}) {
         }
     },[question.answerType])
     
-    const isInitialMount = useRef(true);
-    useEffect(()=>{
-    if (isInitialMount.current) {
-            isInitialMount.current = false;
-    } 
-    else {
-        if(question.labeling){
-            const color=generateColor()
-            setQuestion({...question,color:color});
-            setSurveyChange('color',color,questionIndex);
-        }
-        else{
-            setQuestion({...question,color:''});
-            setSurveyChange('color','',questionIndex);
-        }
-    }
-    },[question.labeling])
+    // const isInitialMount = useRef(true);
+    // useEffect(()=>{
+    // if (isInitialMount.current) {
+    //         isInitialMount.current = false;
+    // } 
+    // else {
+    //     if(question.labeling){
+    //         const color=generateColor()
+    //         setQuestion({...question,color:color});
+    //         setSurveyChange('color',color,questionIndex);
+    //     }
+    //     else{
+    //         setQuestion({...question,color:''});
+    //         setSurveyChange('color','',questionIndex);
+    //     }
+    // }
+    // },[question.labeling])
 
     const newOption=()=>{
         const array= [...arrayOptions];

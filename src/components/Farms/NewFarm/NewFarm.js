@@ -87,7 +87,7 @@ function NewFarm() {
     },[])
   return (
     <div>
-        <h1 className={newStyles.newFarmHeading}>New Farm</h1>
+        <h1 className={newStyles.newFarmHeading}>New Scan</h1>
         <div>
             <div className={newStyles.selectFarmContainer}>
                 <label style={{marginRight:"0.5rem"}} htmlFor="farms">Select Farm</label>

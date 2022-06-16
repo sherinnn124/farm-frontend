@@ -26,8 +26,8 @@ const survey={
           question:'question three?',
           answers:['option three','option four','option five','option six','option seven'],
           answerType:'checkbox',
-          required:false,
-          labeling:true,
+          required:true,
+          labeling:false,
           color:'002cda'
       }
   ]
