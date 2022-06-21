@@ -1,19 +1,18 @@
 import logo from '../../../assets/logo.png';
 import { GiHamburgerMenu} from "react-icons/gi";
-import { useEffect, useRef, useState } from 'react';
-import {NavLink} from 'react-router-dom'
+import { useEffect, useRef, useState} from 'react';
+import {NavLink,useNavigate,useLocation} from 'react-router-dom'
 import styles from './styles.module.css'
-// import {logout} from '../../../services/service';
 import axios from 'axios';
 
 
-
-function Navbar({}) {
+function Navbar() {
   const[showLinks,setShowLinks]=useState(false)
   const linkContainerRef=useRef(null)
   const linksRef=useRef(null)
   const[logout,setLogout]=useState(false)
-
+  const navigate=useNavigate();
+  const location=useLocation();
   const display=()=>{
     setShowLinks(!showLinks)
   }
@@ -38,13 +37,19 @@ function Navbar({}) {
   }
   useEffect(()=>{
     if(logout==true){
-      axios.get("token/logout")
+      axios.get("user/logout")
       .then(res=>{
         console.log(res)
         localStorage.removeItem('user');
         localStorage.removeItem('token');
+        // navbar.setNavbarHidden(true);
+        // window.location.reload();
+        // window.location.reload();
+        navigate('/login',{state:{path:location.pathname}})
         window.location.reload();
-        setLogout("false")
+        setLogout(false)
+        
+        // setLogout(false)
       })
       .catch(e=>console.log('failed'))
     }
@@ -64,11 +69,11 @@ function Navbar({}) {
             </div>
             <div className={styles.linksContainer} ref={linkContainerRef}>
                 <ul className={`${styles.links} ${styles.ul}`} ref={linksRef}>
-                    <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="home">Home</NavLink></li>
+                    <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="/">Home</NavLink></li>
                     <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="labelers">Labelers</NavLink></li>
                     <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="surveys">Surveys</NavLink></li>
                     <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="farms">Farms</NavLink></li>
-                    <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="/" onClick={()=>setLogout(true)}>Log Out</NavLink></li>
+                    <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="/login" onClick={()=>setLogout(true)}>Log Out</NavLink></li>
 
                 </ul>
             </div>

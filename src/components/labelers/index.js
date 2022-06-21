@@ -10,6 +10,7 @@ import Select from 'react-select'
 import validator from 'validator'
 import axios from 'axios';
 import {customStyles,customTheme} from '../../services/service'
+import Loader from '../Loader';
 
 
 
@@ -22,6 +23,7 @@ function Labelers() {
     const [formErrors,setFormErrors]=useState({});
     const [showAlert,setShowAlert]=useState(false);
     const [selectedRole,setSelectedRole]=useState(null)
+    const [loading,setIsLoading]=useState(true);
     
     const options=[
         {
@@ -44,7 +46,10 @@ function Labelers() {
 
     useEffect(()=>{
         axios.get('user')
-        .then(response=>setUsersData(response.data.items))
+        .then(response=>{
+            setUsersData(response.data.items);
+            setIsLoading(false)
+        })
         .catch(error=>console.log(error))
     },[])
     const handleChange=(e)=>{
@@ -100,6 +105,7 @@ function Labelers() {
     },[showAlert])
     return (
     <>
+    {loading?<Loader/>:
     <div className='container'>
         <div className='btnContainer'>
             <button className='btn' style={{marginTop:'2rem'}} onClick={()=>setIsLabelerModalOpen(true)}>+New labeler</button>
@@ -121,8 +127,8 @@ function Labelers() {
             <tr><td colSpan="7">No labelers Yet</td></tr>:
                 usersData.map((userData)=>{
                     return(
-                    <tr key={userData.ud}>
-                        <td>{userData.ud}</td>
+                    <tr key={userData.id}>
+                        <td>{userData.id}</td>
                         <td>{userData.name}</td>
                         <td>{userData.email}</td>
                         <td>{userData.mobile}</td>
@@ -139,6 +145,7 @@ function Labelers() {
             </tbody>
         </table>
     </div>
+    }
     <div className={isLabelerModalOpen?`${styles.modalOverlay} ${styles.showModal}`:`${styles.modalOverlay}`} >
             <div className={styles.modalContainer}>
                 <button  className={styles.closeModal} style={{fontWeight:'bold'}} onClick={()=>setIsLabelerModalOpen(false)}>
@@ -166,6 +173,7 @@ function Labelers() {
         <p>Invitation sent <IoCheckmarkDone/></p>
     </div>
     }
+    
     </>
     )
 }

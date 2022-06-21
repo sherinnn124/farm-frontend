@@ -4,7 +4,6 @@ const surveys=[
     surveyTitle:'survey one',
     surveyDescription:'description one',
     updated:'26-5-2022',
-    treeId:'5',
     treeType:'mango',
     questions:[
         {

@@ -1,13 +1,16 @@
-import React, { useEffect } from 'react'
+import React, { useEffect} from 'react'
 import { useState } from 'react'
 import { useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import { FaEdit,FaTrash} from "react-icons/fa";
 import data from './data'
+import Loader from '../Loader';
 function Surveys() {
     //data should come from backend
     const[surveysData,setSurveysData]=useState([]);
+    const [loading,setIsLoading]=useState(true);
     const navigate=useNavigate();
+    
     
 
     const newSurvey=()=>{
@@ -36,12 +39,17 @@ function Surveys() {
     }
 
     useEffect(()=>{
-        axios.get('survay')
-        .then(response=>setSurveysData(response.data.items))
+        axios.get('survey')
+        .then(response=>{
+            setSurveysData(response.data.items);
+            setIsLoading(false)
+        })
         .catch(e=>console.log(e))
-    })
+    },[])
 
   return (
+    <>
+    {loading?<Loader/>:
     <div className='container'>
         <div className='btnContainer'>
             <button className='btn' style={{marginTop:'2rem'}} onClick={()=>navigate('newSurvey')}>+New Survey</button>
@@ -64,7 +72,7 @@ function Surveys() {
                     return(
                     <tr key={survey.id}>
                         <td>{survey.id}</td>
-                        <td>{survey.title}</td>
+                        <td>{survey.surveyTitle}</td>
                         <td>{survey.treeTypeDesc}</td>
                         <td>{survey.description}</td>
                         <td>{survey.updated}</td>
@@ -79,6 +87,8 @@ function Surveys() {
             </tbody>
         </table>
     </div>
+    }
+    </>
   )
 }
 

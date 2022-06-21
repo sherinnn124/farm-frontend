@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState,useContext } from 'react'
 import validator from 'validator'
 import styles from './styles.module.css'
-import {useNavigate} from 'react-router-dom'
+import {useLocation, useNavigate} from 'react-router-dom'
 import axios from 'axios'
-
+import {navbarContext} from '.././../App'
 function Login({loggedInUser}) {
     const initialValues = {password: "",username:'' };
     const[user,setUser]=useState(initialValues)
@@ -11,19 +11,31 @@ function Login({loggedInUser}) {
     const[isSubmitted,setIsSubmitted]=useState(false)
     const navigate=useNavigate()
     const[warning,setWarning]=useState('');
-
-
+    const navbar=useContext(navbarContext);
+    const {state}=useLocation();
+useEffect(()=>{
+navbar.setNavbarHidden(true);
+return ()=>{navbar.setNavbarHidden(false);
+}
+},[])
 
 useEffect(() => {
     if (Object.keys(formErrors).length === 0 && isSubmitted) {
-    axios.post('token/generate-token',user)
+    axios.post('user/login',user)
     .then(res=>{
+        console.log(res)
         setWarning('')
         localStorage.setItem('token',res.data.items.token);
-        localStorage.setItem('user',JSON.stringify(res.data.items));
+        localStorage.setItem('user',JSON.stringify(res.data.items.user));
         loggedInUser(res.data.items);
-        navigate('home')
-        window.location.reload();
+        if(state.path === "/login"){
+            navigate('/',{ replace: true });
+            window.location.reload()
+        }
+        else{
+            navigate(state.path,{ replace: true });
+            window.location.reload()
+        }
     })
     .catch(e=>{
         setWarning('incorrect username or password')

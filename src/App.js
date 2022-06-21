@@ -4,7 +4,7 @@ import Login from './components/login';
 import HomePage from './components/HomePage'
 import {Route,Routes} from 'react-router-dom'
 import { useState } from 'react';
-import { useNavigate,useLocation } from 'react-router-dom';
+import { useNavigate,useLocation,Navigate } from 'react-router-dom';
 import Navbar from './components/shared/Navbar';
 import NotFound from './components/NotFound';
 import Farms from './components/Farms'
@@ -20,23 +20,28 @@ import AnswerLabelSurvey from './components/AnswerLabelSurvey';
 
 
 export const userContext=React.createContext();
+export const navbarContext=React.createContext();
 function App() {
   const[user,setUser]=useState(undefined);
-  const navigate=useNavigate()
-  const[navbarHidden,setNavbarHidden]=useState(true)
-  const location = useLocation()
+  const navigate=useNavigate();
+  const[navbarHidden,setNavbarHidden]=useState(true);
+  const location = useLocation();
 
   useEffect(()=>{
     const currentUser=JSON.parse(localStorage.getItem('user'));
     if(currentUser){
       setUser(currentUser)
       setNavbarHidden(false);
-      if(location.pathname==='/'){
-      navigate('home')
+      console.log(location.pathname)
+      if(location.pathname === '/login'){
+        navigate("/",{replace:true})
+      }
+      else{
+        navigate(location.pathname,{replace:true})
       }
     }
     else{
-      navigate('/')
+      navigate('login',{state:{path:location.pathname}})
     }
   },[])
 
@@ -47,20 +52,24 @@ function App() {
 
   return (
     <userContext.Provider value={user}>
-      {navbarHidden?null:<Navbar/>}
-      <Routes>
-        <Route path='/' element={<Login loggedInUser={loggedInUser}/>}></Route>
-        <Route path='home' element={<HomePage/>}></Route>
-        <Route path='farms' element={<Farms/>}></Route>
-        <Route path='farms/newFarm' element={<NewFarm/>}></Route>
-        <Route path='farms/edit/:id' element={<EditFarm/>}></Route>
-        <Route path='surveys' element={<Surveys/>}></Route>
-        <Route path='surveys/newSurvey' element={<NewSurvey/>}></Route>
-        <Route path='labelers' element={<Labelers/>}></Route>
-        <Route path='surveys/edit/:id' element={<NewSurvey/>}></Route>
-        <Route path='*' element={<NotFound navbar={{navbarHidden,setNavbarHidden}}/>}></Route>
-        <Route path='AnswerLabelSurvey/:id' element={<AnswerLabelSurvey/>}></Route>
-      </Routes>
+        <navbarContext.Provider value={{navbarHidden,setNavbarHidden}}>
+          {navbarHidden?null:<Navbar />}
+          <Routes>
+            {/* <Route path='login' element={<Login loggedInUser={loggedInUser}/>}></Route> */}
+            <Route path='login' element={!user?<Login loggedInUser={loggedInUser}/>:<Navigate to="/"/>}></Route>
+            <Route path='*' element={<NotFound navbar={{navbarHidden,setNavbarHidden}}/>}></Route>
+            {/* <Route path='loader' element={<Loader/>}></Route> */}
+            <Route path='/' element={<HomePage/>}></Route>
+            <Route path='farms' element={<Farms/>}></Route>
+            <Route path='farms/newFarm' element={<NewFarm/>}></Route>
+            <Route path='farms/edit/:id' element={<EditFarm/>}></Route>
+            <Route path='surveys' element={<Surveys/>}></Route>
+            <Route path='surveys/newSurvey' element={<NewSurvey/>}></Route>
+            <Route path='labelers' element={<Labelers/>}></Route>
+            <Route path='surveys/edit/:id' element={<NewSurvey/>}></Route>
+            <Route path='AnswerLabelSurvey/:id' element={<AnswerLabelSurvey/>}></Route>
+          </Routes>
+        </navbarContext.Provider>
     </userContext.Provider>
   );
 }
