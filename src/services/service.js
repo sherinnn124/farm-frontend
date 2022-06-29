@@ -1,15 +1,11 @@
-const updated=()=>{
-    const today=new Date();
-    const date=`${today.getDate()}-${today.getMonth()+1}-${today.getFullYear()}`;
-
-    return date
-}
 // react-select functions for styling
-
 const customStyles = {
     option:(provided,state)=>({
         ...provided,
         color:state.isSelected?'white':'black',
+        cursor:state.isDisabled?'not-allowed':'pointer',
+        backgroundColor:state.isDisabled?'white':state.isSelected?'var(--main-color)':state.isFocused&&'var(--input-border-bottom)'
+        
     })
 }
 const customTheme=(theme)=>{
@@ -26,12 +22,7 @@ const customTheme=(theme)=>{
 const generateColor = () =>{
     let color = Math.random().toString(16).substr(-6);
     return color
-  //   let newColors=[];
-  //   for(let i=0;i<survey.surveyResult.length;i++){
-  //     colors.push(Math.random().toString(16).substr(-6))
-  //   }
-  // setColors(newColors)
 };
 
 
-export {updated,customStyles,customTheme,generateColor}
+export {customStyles,customTheme,generateColor}

@@ -10,7 +10,7 @@ import Select from 'react-select'
 import validator from 'validator'
 import axios from 'axios';
 import {customStyles,customTheme} from '../../services/service'
-import Loader from '../Loader';
+import Loader from '../shared/Loader';
 
 
 

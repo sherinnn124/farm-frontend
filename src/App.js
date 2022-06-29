@@ -7,9 +7,9 @@ import { useState } from 'react';
 import { useNavigate,useLocation,Navigate } from 'react-router-dom';
 import Navbar from './components/shared/Navbar';
 import NotFound from './components/NotFound';
-import Farms from './components/Farms'
-import NewFarm from './components/Farms/NewFarm/NewFarm';
-import EditFarm from './components/Farms/EditFarm';
+import LabelingTasks from './components/LabelingTasks'
+import NewTask from './components/LabelingTasks/NewTask';
+// import EditFarm from './components/Farms/EditFarm';
 import Surveys from './components/Surveys'
 import Labelers from './components/labelers';
 import NewSurvey from './components/Surveys/AddEditSurvey';
@@ -55,14 +55,12 @@ function App() {
         <navbarContext.Provider value={{navbarHidden,setNavbarHidden}}>
           {navbarHidden?null:<Navbar />}
           <Routes>
-            {/* <Route path='login' element={<Login loggedInUser={loggedInUser}/>}></Route> */}
             <Route path='login' element={!user?<Login loggedInUser={loggedInUser}/>:<Navigate to="/"/>}></Route>
             <Route path='*' element={<NotFound navbar={{navbarHidden,setNavbarHidden}}/>}></Route>
-            {/* <Route path='loader' element={<Loader/>}></Route> */}
             <Route path='/' element={<HomePage/>}></Route>
-            <Route path='farms' element={<Farms/>}></Route>
-            <Route path='farms/newFarm' element={<NewFarm/>}></Route>
-            <Route path='farms/edit/:id' element={<EditFarm/>}></Route>
+            <Route path='labelingTasks' element={<LabelingTasks/>}></Route>
+            <Route path='labelingTasks/newTask' element={<NewTask/>}></Route>
+            {/* <Route path='farms/edit/:id' element={<EditFarm/>}></Route> */}
             <Route path='surveys' element={<Surveys/>}></Route>
             <Route path='surveys/newSurvey' element={<NewSurvey/>}></Route>
             <Route path='labelers' element={<Labelers/>}></Route>

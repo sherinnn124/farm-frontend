@@ -4,33 +4,16 @@ import { useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import { FaEdit,FaTrash} from "react-icons/fa";
 import data from './data'
-import Loader from '../Loader';
+import Loader from '../shared/Loader';
 function Surveys() {
     //data should come from backend
     const[surveysData,setSurveysData]=useState([]);
     const [loading,setIsLoading]=useState(true);
+    const [removedSurveyID,setRemovedSurveyId]=useState(null);
     const navigate=useNavigate();
     
     
 
-    const newSurvey=()=>{
-        let number;
-        if(surveysData.length!=0){number=surveysData[surveysData.length-1].id+1;}
-        else{number=1}
-        const today=new Date();
-        const date=today.getFullYear()+'/'+(today.getMonth()+1)+'/'+today.getDate();
-        const survey={
-            id:number,
-            name:`farm${number}`,
-            labelers:"",
-            labels:"",
-            progress:"",
-            survies:"",
-            updated:date
-        }
-        setSurveysData([...surveysData,survey])
-        // posting new farm
-    }
 
     const removeSurvey=(id)=>{
         setSurveysData((previousSurveys)=>previousSurveys.filter((survey)=>survey.id!=id));
@@ -47,6 +30,17 @@ function Surveys() {
         .catch(e=>console.log(e))
     },[])
 
+    useEffect(()=>{
+        if(removedSurveyID){
+            axios.delete(`survey/${removedSurveyID}`)
+            .then((response)=>{
+                console.log(response)
+                setRemovedSurveyId(null)
+            })
+            .catch(error=>console.log(error))
+        }
+    },[removedSurveyID])
+
   return (
     <>
     {loading?<Loader/>:
@@ -60,7 +54,6 @@ function Surveys() {
                     <th>ID</th>
                     <th>Title</th>
                     <th>Tree Type</th>
-                    <th>Description</th>
                     <th>Updated</th>
                     <th>Actions</th>
                 </tr>
@@ -74,11 +67,10 @@ function Surveys() {
                         <td>{survey.id}</td>
                         <td>{survey.surveyTitle}</td>
                         <td>{survey.treeTypeDesc}</td>
-                        <td>{survey.description}</td>
                         <td>{survey.updated}</td>
                         <td style={{display:"flex"}}>
                             <button className='edit action' style={{fontSize:'1rem'}} onClick={()=>navigate(`edit/${survey.id}`,{state:{survey:survey}})}><FaEdit/></button>
-                            <button className='remove action'style={{fontSize:'1rem'}} onClick={()=>removeSurvey(survey.id)}><FaTrash/></button>
+                            <button className='remove action'style={{fontSize:'1rem'}} onClick={()=>setRemovedSurveyId(survey.id)}><FaTrash/></button>
                         </td>
                     </tr>
                     )

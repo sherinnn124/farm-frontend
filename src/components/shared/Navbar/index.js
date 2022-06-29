@@ -72,7 +72,7 @@ function Navbar() {
                     <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="/">Home</NavLink></li>
                     <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="labelers">Labelers</NavLink></li>
                     <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="surveys">Surveys</NavLink></li>
-                    <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="farms">Farms</NavLink></li>
+                    <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="labelingTasks">Labeling tasks</NavLink></li>
                     <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="/login" onClick={()=>setLogout(true)}>Log Out</NavLink></li>
 
                 </ul>

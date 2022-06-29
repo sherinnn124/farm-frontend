@@ -1,6 +1,6 @@
 import React from 'react'
 import { useEffect,useContext} from 'react'
-import { navbarContext } from '../../App'
+import { navbarContext } from '../../../App'
 import './styles.css'
 function Loader() {
   const navbar=useContext(navbarContext)

@@ -5,7 +5,8 @@
 .select{
     border: solid 2px var(--main-color);
     border-radius: 0.25rem;
-    font-family: var(--main-font)
+    font-family: var(--main-font);
+    cursor:pointer
 }
 .newFarmHeading{
     text-align: center;

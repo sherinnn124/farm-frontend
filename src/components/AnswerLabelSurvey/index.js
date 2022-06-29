@@ -6,7 +6,7 @@ import data from './data'
 import {MdOutlineNavigateNext,MdOutlineNavigateBefore} from 'react-icons/md'
 import axios from 'axios'
 import {generateColor} from '../../services/service'
-import Loader from '../Loader'
+import Loader from '../shared/Loader'
 function AnswerLabelSurvey() {
   // const [survey,setSurvey]=useState(data);
   const [survey,setSurvey]=useState(null);
