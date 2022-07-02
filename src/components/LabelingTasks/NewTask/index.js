@@ -22,6 +22,7 @@ function NewTask() {
     const [labelers,setLabelers]=useState(null);
     const [confirmedLabelingTask,setConfirmedLabelingTask]=useState(null);
     const [previousInputValue,setPreviousInputValue]=useState(0);
+    // const [previousInputValue,setPreviousInputValue]=useState(null);
     const [remaining,setRemaining]=useState(null);
     useEffect(()=>{
         axios.get('mdEnum/findByEnumId/2')
@@ -65,6 +66,8 @@ function NewTask() {
                     (type)=>({numOfImages:type.numImages,numOfTrees:type.numTrees})
                 )
             )
+            // //delete here
+            // setPreviousInputValue(selectedTreeTypes.map((type)=>[]));
         }
     },[selectedTreeTypes])
 
@@ -83,6 +86,10 @@ function NewTask() {
         const arrayTwo=[...labelingTasks]
         arrayTwo[i].push(newLabelingTask);
         setLabelingTasks(arrayTwo)
+        //delete here
+        // const array=[...previousInputValue]
+        // array[i].push(0);
+        // setPreviousInputValue(array)
     }
 
     useEffect(()=>{
@@ -181,56 +188,43 @@ function NewTask() {
                                                 let {name,value}=event.target;
                                                 value=isNaN(parseInt(value))?0:parseInt(value);
                                                 setPreviousInputValue(labelingTasks[index][i][name]);
-                                                if(value <= remaining[index][name] || value< labelingTasks[index][i][name] || name=="surveyId" || name=="labelerId"){
+                                                if(value <= remaining[index][name] ){
+                                                    const subtractedValue=labelingTasks[index][i][name]-value;
+                                                    let treeTypeProperty=name.replace("Of","")
+                                                    let array=[...selectedTreeTypes];
+                                                    console.log(value,previousInputValue)
+                                                    array[index]={...array[index],[treeTypeProperty]:array[index][treeTypeProperty]+subtractedValue};
+                                                    setSelectedTreeTypes(array);
+                                                }
+                                                else if(value <labelingTasks[index][i][name]){
+                                                    let treeTypeProperty=name.replace("Of","")
+                                                    let array=[...selectedTreeTypes];
+                                                    const addedValue=labelingTasks[index][i][name]-value;
+                                                    console.log(addedValue)
+                                                    array[index][treeTypeProperty]=array[index][treeTypeProperty] + addedValue;
+                                                        setSelectedTreeTypes(array);
+                                                }
+                                                if(value <= remaining[index][name] || value<labelingTasks[index][i][name] || name=="surveyId" || name=="labelerId"){
                                                     const assignArray=[...labelingTasks];
                                                     assignArray[index][i]={...assignArray[index][i],[name]:value};
                                                     setLabelingTasks(assignArray);
                                                 }
-                                            }
-                                            const keyUp=(e)=>{
-                                                let {name,value}=e.target;
-                                                value=isNaN(parseInt(value))?0:parseInt(value);
-                                                const {key}=e;
-                                                if(name=="numOfTrees" | name=="numOfImages"){
-                                                    let treeTypeProperty=name.replace("Of","")
-                                                    let array=[...selectedTreeTypes];
-                                                    console.log(array)
-                                                    if (key === "Backspace" || key === "Delete" ) {
-                                                        const addedValue=previousInputValue-value;
-                                                        array[index][treeTypeProperty]=array[index][treeTypeProperty] + addedValue;
-                                                        setSelectedTreeTypes(array);
-                                                        passRemaining(e)
-                                                    }
-                                                    else if(value <= remaining[index][name] + value){
-                                                        const subtractedValue=value-previousInputValue;
-                                                        console.log(value,previousInputValue)
-                                                        array[index]={...array[index],[treeTypeProperty]:array[index][treeTypeProperty]-subtractedValue};
-                                                        setSelectedTreeTypes(array)
-                                                    }
-                                                    setPreviousInputValue(null)
-                                                }
+                                                
                                             }
                                             const passRemaining=(e)=>{
                                                 let {name,value}=e.target;
                                                 let treeTypeProperty=name.replace("Of","");
                                                 value=isNaN(parseInt(value))?0:parseInt(value);
                                                 const array={...remaining};
-                                                
-                                                
-                                                if(e.type=="keyup"){
-                                                    remaining[index][name]=selectedTreeTypes[index][treeTypeProperty] + value;
-                                                }
-                                                else if(!isNaN(value)){
-                                                    remaining[index][name]=selectedTreeTypes[index][treeTypeProperty];
-                                                }
+                                                array[index][name]=selectedTreeTypes[index][treeTypeProperty];
                                                 setRemaining(array)
                                             }
-                                            
+
                                             return (
                                                 <tr key={i}>
                                                     <td></td>
-                                                    <td><input onKeyUp={keyUp} onFocus={passRemaining} name={"numOfTrees"} value={labelingTasks[index][i].numOfTrees} onChange={assignInput} /></td>
-                                                    <td><input onKeyUp={keyUp} onFocus={passRemaining} name={"numOfImages"} value={labelingTasks[index][i].numOfImages} onChange={assignInput} /></td>
+                                                    <td><input  name={"numOfTrees"} value={labelingTasks[index][i].numOfTrees} onChange={assignInput} onBlur={passRemaining} /></td>
+                                                    <td><input  name={"numOfImages"} value={labelingTasks[index][i].numOfImages} onChange={assignInput} onBlur={passRemaining}/></td>
                                                     <td>
                                                         <select name={"surveyId"}  onChange={assignInput} defaultValue={"default"}>
                                                         <option value={"default"} disabled hidden>Select survey</option>
