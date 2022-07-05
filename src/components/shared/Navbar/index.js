@@ -69,7 +69,7 @@ function Navbar() {
             </div>
             <div className={styles.linksContainer} ref={linkContainerRef}>
                 <ul className={`${styles.links} ${styles.ul}`} ref={linksRef}>
-                    <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="/">Home</NavLink></li>
+                    <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="/myTasks">Home</NavLink></li>
                     <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="labelers">Labelers</NavLink></li>
                     <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="surveys">Surveys</NavLink></li>
                     <li className={styles.li}><NavLink style={navLinkStyle} className={styles.a} to="labelingTasks">Labeling tasks</NavLink></li>

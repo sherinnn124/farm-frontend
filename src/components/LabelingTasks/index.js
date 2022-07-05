@@ -59,7 +59,7 @@ function LabelingTasks() {
                     <tr>
                         <th>ID</th>
                         <th>Trees Number</th>
-                        <th>Images Numbe</th>
+                        <th>Images Number</th>
                         <th>Survey</th>
                         <th>Labeler</th>
                         <th>progress</th>

@@ -184,7 +184,6 @@ function NewTask() {
                                         labelingTasks[index].map((task, i) => {
                                             
                                             const assignInput=(event)=>{
-                                                console.log(event)
                                                 let {name,value}=event.target;
                                                 value=isNaN(parseInt(value))?0:parseInt(value);
                                                 setPreviousInputValue(labelingTasks[index][i][name]);
@@ -192,7 +191,6 @@ function NewTask() {
                                                     const subtractedValue=labelingTasks[index][i][name]-value;
                                                     let treeTypeProperty=name.replace("Of","")
                                                     let array=[...selectedTreeTypes];
-                                                    console.log(value,previousInputValue)
                                                     array[index]={...array[index],[treeTypeProperty]:array[index][treeTypeProperty]+subtractedValue};
                                                     setSelectedTreeTypes(array);
                                                 }
@@ -200,7 +198,6 @@ function NewTask() {
                                                     let treeTypeProperty=name.replace("Of","")
                                                     let array=[...selectedTreeTypes];
                                                     const addedValue=labelingTasks[index][i][name]-value;
-                                                    console.log(addedValue)
                                                     array[index][treeTypeProperty]=array[index][treeTypeProperty] + addedValue;
                                                         setSelectedTreeTypes(array);
                                                 }
@@ -216,15 +213,20 @@ function NewTask() {
                                                 let treeTypeProperty=name.replace("Of","");
                                                 value=isNaN(parseInt(value))?0:parseInt(value);
                                                 const array={...remaining};
+                                                if(e.type=="blur"){
                                                 array[index][name]=selectedTreeTypes[index][treeTypeProperty];
+                                                }
+                                                else if(e.type="focus"){
+                                                    array[index][name]=selectedTreeTypes[index][treeTypeProperty] +value;
+                                                }
                                                 setRemaining(array)
                                             }
 
                                             return (
                                                 <tr key={i}>
                                                     <td></td>
-                                                    <td><input  name={"numOfTrees"} value={labelingTasks[index][i].numOfTrees} onChange={assignInput} onBlur={passRemaining} /></td>
-                                                    <td><input  name={"numOfImages"} value={labelingTasks[index][i].numOfImages} onChange={assignInput} onBlur={passRemaining}/></td>
+                                                    <td><input  name={"numOfTrees"} onFocus={passRemaining} value={labelingTasks[index][i].numOfTrees} onChange={assignInput} onBlur={passRemaining} /></td>
+                                                    <td><input  name={"numOfImages"} onFocus={passRemaining} value={labelingTasks[index][i].numOfImages} onChange={assignInput} onBlur={passRemaining}/></td>
                                                     <td>
                                                         <select name={"surveyId"}  onChange={assignInput} defaultValue={"default"}>
                                                         <option value={"default"} disabled hidden>Select survey</option>

@@ -4,22 +4,21 @@ import * as Annotorious from '@recogito/annotorious-openseadragon';
 import '@recogito/annotorious-openseadragon/dist/annotorious.min.css';
 
 
-const LabelTwo = ({survey,color,questionIndex,imageData,savedAnno,progress}) => {
+const LabelTwo = ({survey,questionIndex,imageData,savedAnno,progress,labelData}) => {
 
-  const {image,imageIndex}=imageData;
-  const {url,imageId}=image;
-  const {labeling,required}=progress.question;
+  const {imageUrl,imageIndex}=imageData;
+  const mandatoryFlg=progress.mandatoryFlg;
   const chosenOption=survey.chosenOptions[questionIndex];
   const [viewer, setViewer] = useState( null);
   const [anno, setAnno] = useState(null);
   const [colors,setColors]=useState(null);
-  
+  const {surveyId,questionId,imageId,farmId,treeId,visitId}=labelData;
 
   useEffect(() => {
-    if (image && viewer) {
+    if (imageUrl && viewer) {
       viewer.open({
         type:"image",
-        url:url
+        url:imageUrl
       });
     }
   }, [imageIndex,viewer]);
@@ -40,18 +39,6 @@ const LabelTwo = ({survey,color,questionIndex,imageData,savedAnno,progress}) => 
         tileRequestHeaders: {
           Authentication: 'Bearer <AUTH_TOKEN>'
         }
-        // tileSources: {
-        //   type:"image",
-        //   url:image,
-        //   // Image:{
-        //   //   Format: "jpeg",
-        //   //   Overlap: 1,
-        //   //   Size:{ Height: 32893, Width: 46000 },
-        //   //   TileSize: 510,
-        //   //   Url: "https://openslide-demo.s3.dualstack.us-east-1.amazonaws.com/aperio/cmu-1-jp2k-33005/slide_files/",
-        //   //   xmlns: "http://schemas.microsoft.com/deepzoom/2008"
-        //   // }
-        // }
       });    
     setViewer(initViewer );
     const config = {
@@ -66,13 +53,8 @@ const LabelTwo = ({survey,color,questionIndex,imageData,savedAnno,progress}) => 
     annotate.disableSelect=false;
     setAnno(annotate);  
   };
-// useEffect(()=>{
-// if(savedAnno.savedAnnotations[0][imageIndex].length){
-//   anno.setAnnotations(savedAnno.savedAnnotations[0][imageIndex])
-// }
-// },[imageIndex])
 
-
+  
 const isInitialMount = useRef(true);
 useEffect(() => {
   if (isInitialMount.current) {
@@ -94,84 +76,75 @@ const formatter=(annotation)=>{
   }
 }
 }
-const checkForProgress=(isdeleted)=>{
-  let indicator=[...progress.progressIndicator];
-  if(required && labeling){
-    if(survey.surveyResult[questionIndex].answer.length){
-      if(!progress.progressIndicator[questionIndex] && survey.surveyResult[questionIndex].labels.some((label)=>label.length>0)){
-        indicator[questionIndex]=true;
-        progress.setProgressIndicator(indicator);
-        progress.setCurrentProgress(previous=>previous+1);
-      }
-      if(isdeleted && !survey.surveyResult[questionIndex].labels.some((label)=>label.length>0)){
-        indicator[questionIndex]=false;
-        progress.setProgressIndicator(indicator);
-        progress.setCurrentProgress(previous=>previous-1);
-      }
-    }
-  }
-  if(labeling && !required){
-    if(!progress.progressIndicator[questionIndex]){
-      indicator[questionIndex]=true;
-      progress.setProgressIndicator(indicator);
+const checkForProgress=(isDeleted)=>{
+  let progressedBefore=[...progress.progressIndicator];
+  if(chosenOption.questionType=="radio"){
+    if(!progressedBefore[questionIndex]){
+      progressedBefore[questionIndex]=true;
+      progress.setProgressIndicator(progressedBefore);
       progress.setCurrentProgress(previous=>previous+1);
+      console.log("object")
     }
-    if(isdeleted && !(survey.surveyResult[questionIndex].labels.some((label)=>label.length>0))){
-      indicator[questionIndex]=false;
-      progress.setProgressIndicator(indicator);
+    else if(progressedBefore[questionIndex] && isDeleted && !survey.surveyResult[questionIndex].labels.length){
+      progressedBefore[questionIndex]=false;
+      progress.setProgressIndicator(progressedBefore);
       progress.setCurrentProgress(previous=>previous-1);
     }
   }
-  
 }
+
 
   useEffect(()=>{
     if(anno){
-      // if(savedAnno.savedAnnotations[0][imageIndex].length){
-      //   anno.setAnnotations(savedAnno.savedAnnotations[0][imageIndex])
-      // }
+
       anno.on('createSelection', async (selection) => {    
         selection.body = [{
-          questionIndex:questionIndex,
-          imageIndex:imageIndex,
           color:colors,
           optionId:survey.chosenOptions[questionIndex].answers.id,
-          questionIndex:questionIndex
+          questionIndex:questionIndex,
         }];
         await anno.updateSelected(selection);
         anno.saveSelected();
         
         }); 
+
+
         anno.on('createAnnotation', function(annotation, overrideId) {
-          console.log(annotation);
           const array=[...survey.surveyResult];
-          if(!array[questionIndex].labels[imageIndex]){
-            array[questionIndex].labels[imageIndex]=[];
-          }
-          array[questionIndex].labels[imageIndex]=[...array[questionIndex].labels[imageIndex],{id:annotation.id,pixels:annotation.target.selector.value}];
+          const annotationDetails=(annotation.target.selector.value).replace("xywh=pixel:","").split(",").map(parseFloat);
+          const [x,y,xdest,ydest]=annotationDetails;
+          const answerOptionId=annotation.body[0].optionId;
+          array[questionIndex].labels=[...array[questionIndex].labels,{labelId:annotation.id,x,y,xdest,ydest,surveyId,questionId,imageId,answerOptionId,farmId,visitId,treeId,reviewerId:1,labelerId:1,tdRunId:1656029972,labelingTaskId:14}];
           survey.setSurveyResult(array);
           let arrayTwo=[...savedAnno.savedAnnotations];
           arrayTwo[0][imageIndex]=[...arrayTwo[0][imageIndex],annotation];
           savedAnno.setSavedAnnotations(arrayTwo)
           checkForProgress();
         });  
+
+
       anno.on('updateAnnotation', async (annotation, previous) => {
         const array=[...survey.surveyResult];
-          for(let i=0;i<array[questionIndex].labels[imageIndex].length;i++){
-            if(array[questionIndex].labels[imageIndex][i].id==annotation.id){
-                  array[questionIndex].labels[imageIndex][i]={id:annotation.id,pixels:annotation.target.selector.value};
-                  survey.setSurveyResult(array);
-                  const updatedAnnotations=[...savedAnno.savedAnnotations];
-                  updatedAnnotations[0][imageIndex].forEach((element,i) => {
-                    if(element.id===annotation.id){
-                      updatedAnnotations[0][imageIndex][i]=annotation;
-                        savedAnno.setSavedAnnotations(updatedAnnotations)
-                    }
-                  });
-                  break;
+          for(let i=0;i<array[questionIndex].labels.length;i++){
+            if(array[questionIndex].labels[i].labelId==annotation.id){
+              const annotationDetails=(annotation.target.selector.value).replace("xywh=pixel:","").split(",").map(parseFloat);
+              const [x,y,xdest,ydest]=annotationDetails;
+              const answerOptionId=annotation.body[0].optionId;
+              array[questionIndex].labels[i]={labelId:annotation.id,x,y,xdest,ydest,surveyId,questionId,imageId,answerOptionId,farmId,visitId,treeId,reviewerId:1,labelerId:1,tdRunId:1656029972,labelingTaskId:14};
+              survey.setSurveyResult(array);
+              const updatedAnnotations=[...savedAnno.savedAnnotations];
+              updatedAnnotations[0][imageIndex].forEach((element,i) => {
+                if(element.id===annotation.id){
+                  updatedAnnotations[0][imageIndex][i]=annotation;
+                    savedAnno.setSavedAnnotations(updatedAnnotations)
+                }
+              });
+              break;
             }
           }
       });
+
+
       anno.on('mouseEnterAnnotation', function(annotation, element) {
         if(annotation.body[0].questionIndex!==questionIndex){
           anno.disableSelect=true
@@ -180,16 +153,20 @@ const checkForProgress=(isdeleted)=>{
           anno.disableSelect=false
         }
       });
+
+
       anno.on('deleteAnnotation', async (annotation) => {
         const array=[...survey.surveyResult];
-        const newArray=array[questionIndex].labels[imageIndex].filter((label)=>label.id !== annotation.id);
-        array[questionIndex].labels[imageIndex]=newArray
+        const newArray=array[questionIndex].labels.filter((label)=>label.labelId !== annotation.id);
+        array[questionIndex].labels=newArray
         survey.setSurveyResult(array);
         const remainingAnnotations=[...savedAnno.savedAnnotations]
         remainingAnnotations[0][imageIndex]=savedAnno.savedAnnotations[0][imageIndex].filter((anno)=>anno.id!==annotation.id);
         savedAnno.setSavedAnnotations(remainingAnnotations);
         checkForProgress(true);
       });
+
+
       anno.on('mouseLeaveAnnotation', function(annotation, element) {
         anno.disableSelect=false
       });
@@ -202,25 +179,15 @@ const checkForProgress=(isdeleted)=>{
       if(chosenOption.questionType=="radio"){
         if(savedAnno.savedAnnotations[0][imageIndex].length){
           const arrayOne=[...survey.surveyResult];
-          console.log(savedAnno.savedAnnotations[0][imageIndex])
-          savedAnno.savedAnnotations[0].forEach((image,imageIndex)=>{
-            image.forEach((annotation,annotationIndex)=>{
-              console.log(annotation)
+          savedAnno.savedAnnotations[0].forEach((image)=>{
+            image.forEach((annotation)=>{
               if(annotation.body[0].optionId !== chosenOption.answers.id && annotation.body[0].questionIndex==questionIndex){
                 anno.removeAnnotation(annotation);
-                arrayOne[annotation.body[0].questionIndex].labels[imageIndex]=
-                arrayOne[annotation.body[0].questionIndex].labels[imageIndex].filter((label)=>annotation.id !== label.id);
+                arrayOne[annotation.body[0].questionIndex].labels=
+                arrayOne[annotation.body[0].questionIndex].labels.filter((label)=>annotation.id !== label.labelId);
               }
             })
           })
-          // savedAnno.savedAnnotations[0][imageIndex].forEach((annotation)=>{
-          //   console.log(annotation.body[0].optionId,chosenOption.answers.id,annotation.body[0].questionIndex,questionIndex)
-          //   if(annotation.body[0].optionId !== chosenOption.answers.id && annotation.body[0].questionIndex==questionIndex){
-          //     anno.removeAnnotation(annotation);
-          //     arrayOne[questionIndex].labels[imageIndex]=arrayOne[questionIndex].labels[imageIndex].filter((label)=>label.id !== annotation.id)
-          //   }
-          // })
-          console.log(arrayOne)
           survey.setSurveyResult(arrayOne)
           const array=[...savedAnno.savedAnnotations]
           array[0][imageIndex]=array[0][imageIndex].filter((annotation)=>annotation.body[0].optionId==chosenOption.answers.id || annotation.body[0].questionIndex!=questionIndex);

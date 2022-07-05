@@ -1,20 +1,20 @@
-import React, { useEffect, useState,useContext } from 'react'
+import React, { useEffect, useState,useContext} from 'react'
+import { useNavigate,useLocation,Navigate } from 'react-router-dom';
 import {LabelTwo} from './LabelTwo'
 import Answer from './Answer'
 import styles from './styles.module.css'
 import {MdOutlineNavigateNext,MdOutlineNavigateBefore} from 'react-icons/md'
 import axios from 'axios'
 import { questionTypesContext } from '../../App'
-import {generateColor} from '../../services/service'
 import Loader from '../shared/Loader'
 function AnswerLabelSurvey() {
   const [survey,setSurvey]=useState(null);
-  const[questionIndex,setQuestionIndex]=useState(0);
+  const [questionIndex,setQuestionIndex]=useState(0);
   const [questions,setQuestions]=useState(null)
-  const [color,setColor]=useState(null);
   const [surveyResult,setSurveyResult]=useState(null);
+  const [trees,setTrees]=useState(null);
+  const [treeIndex,setTreeIndex]=useState(0);
   const [treeImages,setTreeImages]=useState(null);
-  // const [errors,setErrors]=useState(questions.map((question)=>({})));
   const [totalProgressNumber,setTotalProgressNumber]=useState(0);
   const [currentProgress,setCurrentProgress]=useState(0);
   const [progressIndicator,setProgressIndicator]=useState(null);
@@ -24,17 +24,31 @@ function AnswerLabelSurvey() {
   const [isSubmitted,setIsSubmitted]=useState(false);
   const [chosenOptions,setChosenOptions]=useState(null);
   const questionTypes=useContext(questionTypesContext);
+  const [reload,setReload]=useState(true);
+  const navigate=useNavigate();
+
 
   useEffect(()=>{
-    axios.get('treeImage/findByTreeDetectionId/1656029972/0')
-    .then(response=>
-      setTreeImages(
-        response.data.items.map(
-        (image)=>({url:`http://34.66.190.29:8080/imagetool-be/treeImage/getImageBak/${image.id}`,imageId:image.id})
+    //tdrunid to be replaced with labeling task id i think
+    axios.get('tree/findByTreeDetectionId/1656029972')
+    .then(response=>{
+      const data=response.data.items;
+      setTrees(data);
+    })
+  },[])
+
+  useEffect(()=>{
+    if(trees){
+      axios.get(`treeImage/findByTreeDetectionId/1656029972/${trees[treeIndex].treeId}`)
+      .then(response=>
+        setTreeImages(
+          response.data.items.map(
+          (image)=>({url:`http://34.66.190.29:8080/imagetool-be/treeImage/getImageBak/${image.id}`,imageId:image.id})
+          )
         )
       )
-    )
-  },[])
+    }
+  },[trees,treeIndex])
 
   useEffect(()=>{
     axios.get('survey/14')
@@ -50,37 +64,49 @@ function AnswerLabelSurvey() {
 
   useEffect(()=>{
     if(survey){
-      console.log(survey)
       setQuestions(survey.questions);
     }
   },[survey])
   useEffect(()=>{
-    if(questions && questionTypes){
-      setSurveyResult(questions.map((questionData)=>({surveyId:survey.id,questionId:questionData.id,answerOptionId:[],labels:[]})));
+    if(questions && questionTypes && trees){
+      setSurveyResult(questions.map(
+        (questionData)=>(
+          {
+            // surveyId:survey.id,
+            // questionId:questionData.id,
+            answerOptionId:[],
+            // farmId:trees[treeIndex].farmId,
+            // visitId:trees[treeIndex].visitId,
+            // treeId:trees[treeIndex].treeId,
+            // labelingTaskId:2,
+            // labelerId: 6,
+            labels:[]
+          }
+        )
+      ));
       setProgressIndicator(questions.map((question)=>false));
-      // setColor(questions[0].color)
       setChosenOptions(
         questions.map((question)=>({questionType:questionTypes[question.questionTypeId],answers:[]}))
       )
     }
-  },[questions,questionTypes])
+  },[questions,questionTypes,reload])
 
 
   useEffect(()=>{
     if(questions){
     questions.forEach((question)=>{
-      const {labeling,required}=question;
-      if ((labeling&&required)||(labeling&&!required)|| (!labeling&&required)){
+      if (question.mandatoryFlg){
         setTotalProgressNumber(previous=>previous+1)
       }
     })
   }
   },[questions])
+
+
   const changeIndex=(index)=>{
   var newIndex=index;
   if(index>questions.length-1){newIndex=0}
   if(index<0){newIndex=questions.length-1}
-  setColor(questions[newIndex].color)
   return newIndex
   }
 
@@ -91,7 +117,7 @@ function AnswerLabelSurvey() {
   return newIndex
   }
   useEffect(()=>{
-    if(treeImages&&savedAnnotations&&survey){
+    if(treeImages && savedAnnotations && questions && surveyResult){
     const progressBar=document.getElementsByClassName('styles_progressBar__3w3FG')[0];
     console.log(progressBar)
     progressBar.style.setProperty('--progressWidth',currentProgress/totalProgressNumber);
@@ -101,16 +127,13 @@ function AnswerLabelSurvey() {
   const handleSubmit=()=>{
     const errors=[];
     questions.forEach((question,index)=>{
-    const {labeling,required}=question;
-    if(labeling && required && !(surveyResult[index].answer.length && surveyResult[index].labels.some((label)=>label.length>0))){
-      errors.push('Submission failed answer or labeling required')
-    }
-    else if(required && (!labeling) && (!surveyResult[index].answer.length)){
-      errors.push('Submission failed answer required')
-    }
-    else if (labeling && (!required) && (!surveyResult[index].labels.some((label)=>label.length>0))){
-    errors.push('Submission failed labeling required');
-    }
+    const {mandatoryFlg}=question;
+      if(mandatoryFlg && !surveyResult[index].answerOptionId.length){
+        errors.push('Submission failed answer required');
+      }
+      else if (chosenOptions[index].answers.requireLabelingFlg && !surveyResult[index].labels.length){
+        errors.push('Submission failed labeling required');
+      }
     })
     if(!errors.length){
       setAlert({msg:'Submitted successfully',type:'success',show:true});
@@ -125,7 +148,25 @@ function AnswerLabelSurvey() {
 
   useEffect(()=>{
     if(isSubmitted){
-      // axios.post('',surveyResult)
+      if(treeIndex+1 <= trees.length-1){
+      setReload(!reload);
+      setSavedAnnotations(null)
+      setImageIndex(0);
+      setQuestionIndex(0);
+      setTreeIndex(previous=>previous+1);
+      setCurrentProgress(0)
+      setIsSubmitted(false);
+      let labels=[];
+      surveyResult.forEach((result)=>{
+        labels=[...labels,...result.labels];
+      })
+      console.log(labels);
+      axios.post("labelingResult/saveList",labels)
+      .then(response=>console.log(response))
+      }
+      else{
+        navigate("/myTasks")
+      }
       console.log("success");
     }
   },[isSubmitted])
@@ -168,7 +209,7 @@ function AnswerLabelSurvey() {
             <td className={styles.answerTd}>
               <Answer questionData={{question:questions[questionIndex],questionIndex}} 
               survey={{surveyResult,setSurveyResult,chosenOptions,setChosenOptions}}
-              progress={{currentProgress,setCurrentProgress,progressIndicator,setProgressIndicator}} />
+              progress={{currentProgress,setCurrentProgress,progressIndicator,setProgressIndicator,setTotalProgressNumber}} />
               <div>
                 <button onClick={()=>setQuestionIndex(changeIndex(questionIndex-1))} className={styles.nav}><MdOutlineNavigateBefore/></button>
                 <button onClick={()=>setQuestionIndex(changeIndex(questionIndex+1))} className={styles.nav}><MdOutlineNavigateNext/></button>
@@ -179,12 +220,12 @@ function AnswerLabelSurvey() {
                 <button className={`${styles.nav} ${styles.next}`} onClick={()=>setImageIndex(changeImageIndex(imageIndex+1))}><MdOutlineNavigateNext/></button>
                 {treeImages&&
                   <LabelTwo survey={{surveyResult,setSurveyResult,chosenOptions}} 
-                  color={color} 
                   savedAnno={{savedAnnotations,setSavedAnnotations}} 
-                  progress={{currentProgress,setCurrentProgress,progressIndicator,setProgressIndicator,question:questions[questionIndex]}}
+                  progress={{currentProgress,setCurrentProgress,setTotalProgressNumber,progressIndicator,setProgressIndicator,mandatoryFlg:questions[questionIndex].mandatoryFlg}}
                   questionIndex={questionIndex} 
-                  imageData={{image:treeImages[imageIndex],imageIndex:imageIndex}}/>
-                  //treeImages[imageIndex]
+                  imageData={{imageUrl:treeImages[imageIndex].url,imageIndex:imageIndex}}
+                  labelData={{surveyId:survey.id,questionId:questions[questionIndex].id,
+                  imageId:treeImages[imageIndex].imageId,treeId:trees[treeIndex].id,visitId:trees[treeIndex].visitId,farmId:trees[treeIndex].farmId}}/>
                 }
             </td>
           </tr>
