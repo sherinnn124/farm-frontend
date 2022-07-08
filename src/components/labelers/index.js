@@ -59,8 +59,6 @@ function Labelers() {
     const handleSelectRole=(event)=>{
         setSelectedRole(event);
         setNewLabeler({...newLabeler,usrRoleId:event.value});
-        console.log(newLabeler)
-        console.log(event.value)
     }
     useEffect(()=>{
         if(isSubmitted&&Object.keys(formErrors).length==0){
@@ -106,7 +104,7 @@ function Labelers() {
     return (
     <>
     {loading?<Loader/>:
-    <div className='container'>
+    <div className='container tablecontainer'>
         <div className='btnContainer'>
             <button className='btn' style={{marginTop:'2rem'}} onClick={()=>setIsLabelerModalOpen(true)}>+New labeler</button>
         </div>

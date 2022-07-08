@@ -12,7 +12,7 @@ const LabelTwo = ({survey,questionIndex,imageData,savedAnno,progress,labelData})
   const [viewer, setViewer] = useState( null);
   const [anno, setAnno] = useState(null);
   const [colors,setColors]=useState(null);
-  const {surveyId,questionId,imageId,farmId,treeId,visitId}=labelData;
+  const {surveyId,questionId,imageId,farmId,treeId,visitId,labelerId,labelingTaskId,tdRunId}=labelData;
 
   useEffect(() => {
     if (imageUrl && viewer) {
@@ -83,7 +83,6 @@ const checkForProgress=(isDeleted)=>{
       progressedBefore[questionIndex]=true;
       progress.setProgressIndicator(progressedBefore);
       progress.setCurrentProgress(previous=>previous+1);
-      console.log("object")
     }
     else if(progressedBefore[questionIndex] && isDeleted && !survey.surveyResult[questionIndex].labels.length){
       progressedBefore[questionIndex]=false;
@@ -114,7 +113,7 @@ const checkForProgress=(isDeleted)=>{
           const annotationDetails=(annotation.target.selector.value).replace("xywh=pixel:","").split(",").map(parseFloat);
           const [x,y,xdest,ydest]=annotationDetails;
           const answerOptionId=annotation.body[0].optionId;
-          array[questionIndex].labels=[...array[questionIndex].labels,{labelId:annotation.id,x,y,xdest,ydest,surveyId,questionId,imageId,answerOptionId,farmId,visitId,treeId,reviewerId:1,labelerId:1,tdRunId:1656029972,labelingTaskId:14}];
+          array[questionIndex].labels=[...array[questionIndex].labels,{labelId:annotation.id,x,y,xdest,ydest,surveyId,questionId,imageId,answerOptionId,farmId,visitId,treeId,reviewerId:1,labelerId,tdRunId,labelingTaskId}];
           survey.setSurveyResult(array);
           let arrayTwo=[...savedAnno.savedAnnotations];
           arrayTwo[0][imageIndex]=[...arrayTwo[0][imageIndex],annotation];
@@ -130,7 +129,7 @@ const checkForProgress=(isDeleted)=>{
               const annotationDetails=(annotation.target.selector.value).replace("xywh=pixel:","").split(",").map(parseFloat);
               const [x,y,xdest,ydest]=annotationDetails;
               const answerOptionId=annotation.body[0].optionId;
-              array[questionIndex].labels[i]={labelId:annotation.id,x,y,xdest,ydest,surveyId,questionId,imageId,answerOptionId,farmId,visitId,treeId,reviewerId:1,labelerId:1,tdRunId:1656029972,labelingTaskId:14};
+              array[questionIndex].labels[i]={labelId:annotation.id,x,y,xdest,ydest,surveyId,questionId,imageId,answerOptionId,farmId,visitId,treeId,reviewerId:1,labelerId,tdRunId,labelingTaskId};
               survey.setSurveyResult(array);
               const updatedAnnotations=[...savedAnno.savedAnnotations];
               updatedAnnotations[0][imageIndex].forEach((element,i) => {
@@ -229,7 +228,7 @@ const checkForProgress=(isDeleted)=>{
   }, [imageIndex]);
 
   return (
-        <div id="openSeaDragon"style={{height: "800px",width: "800px"}}></div>   
+        <div id="openSeaDragon"style={{height: "100vh",width:"100%"}}></div>   
   );
 };
 

@@ -9,7 +9,6 @@ import Navbar from './components/shared/Navbar';
 import NotFound from './components/NotFound';
 import LabelingTasks from './components/LabelingTasks'
 import NewTask from './components/LabelingTasks/NewTask';
-// import EditFarm from './components/Farms/EditFarm';
 import Surveys from './components/Surveys'
 import Labelers from './components/labelers';
 import NewSurvey from './components/Surveys/AddEditSurvey';
@@ -64,7 +63,7 @@ function App() {
   },[user])
 
   const loggedInUser=(user)=>{
-    setUser(user);
+    setUser(user.user);
     setNavbarHidden(false);
   }
 
@@ -74,10 +73,9 @@ function App() {
           <questionTypesContext.Provider value={questionTypes}>
             {navbarHidden?null:<Navbar />}
             <Routes>
-              <Route path='login' element={!user?<Login loggedInUser={loggedInUser}/>:<Navigate to="/"/>}></Route>
-              <Route path='/' element={<HomePage/>}></Route>
-              <Route path='myTasks' element={<MyTasks/>}></Route>
-              <Route path='AnswerLabelSurvey/:id' element={<AnswerLabelSurvey/>}></Route>
+              <Route path='login' element={!localStorage.getItem('user')?<Login loggedInUser={loggedInUser}/>:<Navigate to="/"/>}></Route>
+              <Route path='/'  element={<MyTasks/>}></Route>
+              <Route path='answerLabelSurvey' element={<AnswerLabelSurvey/>}></Route>
               <Route path='*' element={<NotFound navbar={{navbarHidden,setNavbarHidden}}/>}></Route>
               <Route element={<AdminProtectedRoutes user={user}/>}>
                 <Route path='labelers' element={<Labelers/>}></Route>

@@ -6,54 +6,73 @@ import styles from './styles.module.css'
 import {MdOutlineNavigateNext,MdOutlineNavigateBefore} from 'react-icons/md'
 import axios from 'axios'
 import { questionTypesContext } from '../../App'
+import { navbarContext } from '../../App';
 import Loader from '../shared/Loader'
 function AnswerLabelSurvey() {
   const [survey,setSurvey]=useState(null);
-  const [questionIndex,setQuestionIndex]=useState(0);
   const [questions,setQuestions]=useState(null)
+  const [questionIndex,setQuestionIndex]=useState(0);
   const [surveyResult,setSurveyResult]=useState(null);
-  const [trees,setTrees]=useState(null);
+  const [treesRecordId,setTreesRecordId]=useState(null);
+  const [currentTree,setCurrentTree]=useState(null)
+  const [currentTreeId,setCurrentTreeId]=useState(null);
   const [treeIndex,setTreeIndex]=useState(0);
   const [treeImages,setTreeImages]=useState(null);
+  const [imageIndex,setImageIndex]=useState(0);
   const [totalProgressNumber,setTotalProgressNumber]=useState(0);
   const [currentProgress,setCurrentProgress]=useState(0);
   const [progressIndicator,setProgressIndicator]=useState(null);
-  const [imageIndex,setImageIndex]=useState(0);
   const [savedAnnotations,setSavedAnnotations]=useState(null);
   const [alert,setAlert]=useState({message:'',type:'',show:false});
   const [isSubmitted,setIsSubmitted]=useState(false);
   const [chosenOptions,setChosenOptions]=useState(null);
-  const questionTypes=useContext(questionTypesContext);
   const [reload,setReload]=useState(true);
+  const questionTypes=useContext(questionTypesContext);
   const navigate=useNavigate();
-
+  const navbar=useContext(navbarContext);
+  const state=useLocation().state;
+  useEffect(()=>{
+    if(state){
+      axios.get(`labelingTaskTrees/findLabelTaskId/${state.labelingTaskId}`)
+      .then(response=>{
+        const data=response.data.items;
+        setTreesRecordId(
+          data.map((item)=>item.treeId)
+        );
+      })
+    }
+  },[state])
 
   useEffect(()=>{
-    //tdrunid to be replaced with labeling task id i think
-    axios.get('tree/findByTreeDetectionId/1656029972')
-    .then(response=>{
-      const data=response.data.items;
-      setTrees(data);
-    })
-  },[])
+    if(treesRecordId){
+      axios.get(`tree/${treesRecordId[treeIndex]}`)
+      .then(response=>{
+        setCurrentTree(response.data.items);
+        setCurrentTreeId(response.data.items.treeId)
+      })
+    }
+  },[treesRecordId,treeIndex])
 
   useEffect(()=>{
-    if(trees){
-      axios.get(`treeImage/findByTreeDetectionId/1656029972/${trees[treeIndex].treeId}`)
-      .then(response=>
+    if(treesRecordId && state && currentTreeId){
+      axios.get(`treeImage/findByTreeDetectionId/${state.tdRunId}/${currentTreeId}`)
+      .then(response=>{
         setTreeImages(
           response.data.items.map(
           (image)=>({url:`http://34.66.190.29:8080/imagetool-be/treeImage/getImageBak/${image.id}`,imageId:image.id})
           )
         )
+          }
       )
     }
-  },[trees,treeIndex])
+  },[treesRecordId,treeIndex,currentTreeId])
 
   useEffect(()=>{
-    axios.get('survey/14')
+    if(state){
+    axios.get(`survey/${state.surveyId}`)
     .then(response=>setSurvey(response.data.items))
-  },[])
+    }
+  },[state])
 
   useEffect(()=>{
     if(treeImages){
@@ -68,18 +87,11 @@ function AnswerLabelSurvey() {
     }
   },[survey])
   useEffect(()=>{
-    if(questions && questionTypes && trees){
+    if(questions && questionTypes){
       setSurveyResult(questions.map(
         (questionData)=>(
           {
-            // surveyId:survey.id,
-            // questionId:questionData.id,
             answerOptionId:[],
-            // farmId:trees[treeIndex].farmId,
-            // visitId:trees[treeIndex].visitId,
-            // treeId:trees[treeIndex].treeId,
-            // labelingTaskId:2,
-            // labelerId: 6,
             labels:[]
           }
         )
@@ -119,7 +131,6 @@ function AnswerLabelSurvey() {
   useEffect(()=>{
     if(treeImages && savedAnnotations && questions && surveyResult){
     const progressBar=document.getElementsByClassName('styles_progressBar__3w3FG')[0];
-    console.log(progressBar)
     progressBar.style.setProperty('--progressWidth',currentProgress/totalProgressNumber);
     }
   },[totalProgressNumber,currentProgress])
@@ -148,11 +159,12 @@ function AnswerLabelSurvey() {
 
   useEffect(()=>{
     if(isSubmitted){
-      if(treeIndex+1 <= trees.length-1){
+      if(treeIndex+1 <= treesRecordId.length-1){
       setReload(!reload);
       setSavedAnnotations(null)
       setImageIndex(0);
       setQuestionIndex(0);
+      setCurrentTreeId(null);
       setTreeIndex(previous=>previous+1);
       setCurrentProgress(0)
       setIsSubmitted(false);
@@ -160,14 +172,13 @@ function AnswerLabelSurvey() {
       surveyResult.forEach((result)=>{
         labels=[...labels,...result.labels];
       })
-      console.log(labels);
+
       axios.post("labelingResult/saveList",labels)
       .then(response=>console.log(response))
       }
       else{
         navigate("/myTasks")
       }
-      console.log("success");
     }
   },[isSubmitted])
 
@@ -181,21 +192,24 @@ function AnswerLabelSurvey() {
     }
   },[alert])
 
+  useEffect(()=>{
+    if(navbar){
+      navbar.setNavbarHidden(true);
+    }
+  })
+
    return (
     <>
-    {
-    !(treeImages && survey)?<Loader/>:
-    <div className={`container ${styles.container}`}>
       {alert.show && 
       <div style={{position:'fixed',left:'50%',bottom:'1rem',transform:'translateX(-50%)'
       ,backgroundColor:alert.type=="success"?'#d4edda':'#f8d7da',zIndex:'1',padding:'0.5rem',borderRadius:'0.25rem'}}>
       {alert.msg}
       </div>}
-      {treeImages && savedAnnotations && questions && surveyResult &&
+      {treeImages && savedAnnotations && questions && surveyResult&& currentTree ?
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>Tree-{survey.treeType}</th>
+            <th>Tree-{currentTreeId}</th>
             <th>
               <div className={styles.progressSubmitContainer}>
                 <div className={styles.progressBar}></div>
@@ -206,7 +220,7 @@ function AnswerLabelSurvey() {
         </thead>
         <tbody>
           <tr style={{backgroundColor:"var(--background-color)"}}>
-            <td className={styles.answerTd}>
+            <td className={styles.answerTd} style={{width:window.innerWidth*1/4}}>
               <Answer questionData={{question:questions[questionIndex],questionIndex}} 
               survey={{surveyResult,setSurveyResult,chosenOptions,setChosenOptions}}
               progress={{currentProgress,setCurrentProgress,progressIndicator,setProgressIndicator,setTotalProgressNumber}} />
@@ -215,7 +229,7 @@ function AnswerLabelSurvey() {
                 <button onClick={()=>setQuestionIndex(changeIndex(questionIndex+1))} className={styles.nav}><MdOutlineNavigateNext/></button>
               </div>
             </td>
-            <td className={styles.labelTd}>
+            <td className={styles.labelTd} style={{width:window.innerWidth*3/4}}>
                 <button className={`${styles.nav} ${styles.previous}`} onClick={()=>setImageIndex(changeImageIndex(imageIndex-1))}><MdOutlineNavigateBefore/></button>
                 <button className={`${styles.nav} ${styles.next}`} onClick={()=>setImageIndex(changeImageIndex(imageIndex+1))}><MdOutlineNavigateNext/></button>
                 {treeImages&&
@@ -224,16 +238,22 @@ function AnswerLabelSurvey() {
                   progress={{currentProgress,setCurrentProgress,setTotalProgressNumber,progressIndicator,setProgressIndicator,mandatoryFlg:questions[questionIndex].mandatoryFlg}}
                   questionIndex={questionIndex} 
                   imageData={{imageUrl:treeImages[imageIndex].url,imageIndex:imageIndex}}
-                  labelData={{surveyId:survey.id,questionId:questions[questionIndex].id,
-                  imageId:treeImages[imageIndex].imageId,treeId:trees[treeIndex].id,visitId:trees[treeIndex].visitId,farmId:trees[treeIndex].farmId}}/>
+                  labelData={{
+                  surveyId:survey.id,questionId:questions[questionIndex].id,
+                  imageId:treeImages[imageIndex].imageId,
+                  treeId:currentTreeId,
+                  visitId:currentTree.visitId,
+                  farmId:currentTree.farmId,
+                  labelingTaskId:state.labelingTaskId,
+                  tdRunId:state.tdRunId,
+                  labelerId:state.labelerId
+                }}/>
                 }
             </td>
           </tr>
         </tbody>
-      </table>
+      </table>:<Loader/>
       }
-    </div>
-  }
     </>
   )
 }

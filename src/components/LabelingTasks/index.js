@@ -8,13 +8,13 @@ function LabelingTasks() {
     //data should come from backend
     const [labelingTasks,setLabelingTasks]=useState(null);
     const [surveys,setSurveys]=useState(null);
-    const [labelers,setLabelers]=useState(null)
+    const [labelers,setLabelers]=useState(null);
     const navigate=useNavigate();
     
 
     useEffect(()=>{
         axios.get('labelingTask')
-        .then(response=>{setLabelingTasks(response.data.items);console.log(response.data.items)})
+        .then(response=>setLabelingTasks(response.data.items))
     },[])
 
 

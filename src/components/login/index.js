@@ -23,13 +23,12 @@ useEffect(() => {
     if (Object.keys(formErrors).length === 0 && isSubmitted) {
     axios.post('user/login',user)
     .then(res=>{
-        console.log(res)
         setWarning('')
         localStorage.setItem('token',res.data.items.token);
         localStorage.setItem('user',JSON.stringify(res.data.items.user));
         loggedInUser(res.data.items);
         if(state.path === "/login"){
-            navigate('/',{ replace: true });
+            navigate('/',{ replace: true});
             window.location.reload()
         }
         else{

@@ -21,9 +21,8 @@ function NewTask() {
     const [surveys,setSurveys]=useState(null);
     const [labelers,setLabelers]=useState(null);
     const [confirmedLabelingTask,setConfirmedLabelingTask]=useState(null);
-    const [previousInputValue,setPreviousInputValue]=useState(0);
-    // const [previousInputValue,setPreviousInputValue]=useState(null);
     const [remaining,setRemaining]=useState(null);
+    const [alert,setAlert]=useState({message:'',type:'',show:false});
     useEffect(()=>{
         axios.get('mdEnum/findByEnumId/2')
         .then(response=>{
@@ -36,25 +35,36 @@ function NewTask() {
         })
     },[])
 
+    
     useEffect(()=>{
-        axios.get('treeDetection/findByTreeDetectionId/1655986175')
-        .then(response=>{setTreesDetection(response.data.items)})
-        .catch(error=>console.log(error))
+        axios.post('treeDetection/findTreeDetections',
+        {
+            filter: {
+            preferedDetectionFlg: true,
+            totalRecFlg: true,
+            } 
+        })
+        .then(response=>setTreesDetection(response.data.items))
     },[])
-    
-    
+
     const handleChange=(e)=>{
         setSelectedRun(treesDetection[e.target.value])
         setShowTable(true)
     }
 
+
     useEffect(()=>{
         if(selectedRun){
-            axios.get(`treeDetection/findByTreeDetectionId/${selectedRun.tdRunId}`)
-            .then((response)=>{
-                //prefered flag needs to be added
-                setSelectedTreeTypes(response.data.items.filter((record)=>!record.totalRecFlg && (record.tdRunId===selectedRun.tdRunId)))
-            })
+            axios.post(`treeDetection/findTreeDetections`,
+            {
+                filter: {
+                preferedDetectionFlg: true,
+                totalRecFlg: false,
+                tdRunId:selectedRun.tdRunId
+                } 
+            }
+            )
+            .then((response)=>setSelectedTreeTypes(response.data.items))
         }
     },[selectedRun])
     
@@ -66,8 +76,6 @@ function NewTask() {
                     (type)=>({numOfImages:type.numImages,numOfTrees:type.numTrees})
                 )
             )
-            // //delete here
-            // setPreviousInputValue(selectedTreeTypes.map((type)=>[]));
         }
     },[selectedTreeTypes])
 
@@ -86,16 +94,19 @@ function NewTask() {
         const arrayTwo=[...labelingTasks]
         arrayTwo[i].push(newLabelingTask);
         setLabelingTasks(arrayTwo)
-        //delete here
-        // const array=[...previousInputValue]
-        // array[i].push(0);
-        // setPreviousInputValue(array)
     }
 
     useEffect(()=>{
         if(confirmedLabelingTask){
             axios.post('labelingTask',{...confirmedLabelingTask,treeDetectionRunId:selectedRun.tdRunId})
-            .then(response=>setConfirmedLabelingTask(null))
+            .then(response=>{
+                setConfirmedLabelingTask(null);
+                setAlert({msg:'Task added',type:'success',show:true})
+            })
+            .catch(e=>{
+                setAlert({msg:'Task not assigned',type:'failiure',show:true})
+                setConfirmedLabelingTask(null);
+            })
         }
     },[confirmedLabelingTask])
 
@@ -105,10 +116,24 @@ function NewTask() {
         array[treeTypeIndex].splice(labelingTaskIndex,1);
         setLabelingTasks(array);
     }
+
+    useEffect(()=>{
+        if(alert.show){
+        const timeOut=setTimeout(() => {
+            setAlert({msg:'',type:'',show:false})
+        },2000);
+        return ()=>clearInterval(timeOut)
+        }
+    },[alert])
   return (
     <>
     { !(surveys && labelers && mdEnumTreeTypes)?<Loader/>:
     <div>
+        {alert.show && 
+        <div style={{position:'fixed',left:'50%',bottom:'1rem',transform:'translateX(-50%)'
+        ,backgroundColor:alert.type=="success"?'#d4edda':'#f8d7da',zIndex:'1',padding:'0.5rem',borderRadius:'0.25rem'}}>
+        {alert.msg}
+        </div>}
         <h1 className={newStyles.newFarmHeading}>New labeling task</h1>
         <div>
             {treesDetection &&
@@ -117,7 +142,6 @@ function NewTask() {
                     <select name="selectedRun"  onChange={handleChange} defaultValue={"default"} className={newStyles.select}>
                     <option value={"default"} disabled hidden>Select...</option>
                         {
-                            //prefered flag needs to be added
                             treesDetection.map((run,index)=>{
                                 if(run.totalRecFlg==true){
                                     return(
@@ -186,7 +210,6 @@ function NewTask() {
                                             const assignInput=(event)=>{
                                                 let {name,value}=event.target;
                                                 value=isNaN(parseInt(value))?0:parseInt(value);
-                                                setPreviousInputValue(labelingTasks[index][i][name]);
                                                 if(value <= remaining[index][name] ){
                                                     const subtractedValue=labelingTasks[index][i][name]-value;
                                                     let treeTypeProperty=name.replace("Of","")

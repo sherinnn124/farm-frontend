@@ -44,7 +44,7 @@ function Surveys() {
   return (
     <>
     {loading?<Loader/>:
-    <div className='container'>
+    <div className='container tablecontainer'>
         <div className='btnContainer'>
             <button className='btn' style={{marginTop:'2rem'}} onClick={()=>navigate('newSurvey')}>+New Survey</button>
         </div>

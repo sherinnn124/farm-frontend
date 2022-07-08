@@ -10,7 +10,6 @@
 .answerTd{
   background-color:white;
   border-right: 2px solid var(--main-color);
-  max-width: 200px;
 }
 .nav{
   background-color: transparent;
@@ -20,14 +19,14 @@
   color: var(--main-color);
 }
 .table{
-  border-collapse: separate !important;
+  border-collapse: collapse ;
   border: 2px solid var(--main-color);
   border-spacing: 0;
   text-align: center;
 }
 .progressBar{
   width:400px;
-  height:3em;
+  height:2em;
   background-color: white;
   border-radius: 1.5em;
   margin: 0 auto;
@@ -36,7 +35,7 @@
 .progressBar::before{
   content:'';
   position: absolute;
-  height: 2em;
+  height: 1em;
   top:50%;
   left: 0.5em;
   transform: translateY(-50%);

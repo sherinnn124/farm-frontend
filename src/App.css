@@ -15,7 +15,7 @@
 }
 body{
   background-color:var(--background-color);
-  font-family: var(--main-font)
+  font-family: var(--main-font);
 }
 form,input,button,textarea,select,option{
   font-family: var(--main-font)
@@ -55,6 +55,14 @@ table{
   border-radius: 0.25rem 0.25rem 0 0;
   overflow: hidden;
 }
+
+  @media (max-width: 768px) {
+    .tablecontainer {
+        width: 100%;
+        overflow-x: scroll;
+    }
+  }
+
 tr{
   background-color: white;
   border-bottom: 1px solid #dddddd;
