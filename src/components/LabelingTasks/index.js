@@ -80,7 +80,7 @@ function LabelingTasks() {
                             <td>{task.status}</td>
                             <td style={{display:"flex"}}>
                                 <button className='edit action' style={{fontSize:'1rem'}} onClick={()=>navigate(`edit/${task.id}`,{state:{task:task}})}><FaEdit/></button>
-                                <button className='remove action' style={{fontSize:'1rem'}} onClick={()=>removeTask(task.id)}><FaTrash/></button>
+                                {/* <button className='remove action' style={{fontSize:'1rem'}} onClick={()=>removeTask(task.id)}><FaTrash/></button> */}
                             </td>
                         </tr>
                         )

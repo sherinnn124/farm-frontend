@@ -140,7 +140,7 @@ function NewTask() {
     },[alert])
   return (
     <>
-    { !(surveys && labelers && mdEnumTreeTypes)?<Loader/>:
+    { !(surveys && labelers && mdEnumTreeTypes && treesDetection)?<Loader/>:
     <div>
         {alert.show && 
         <div style={{position:'fixed',left:'50%',bottom:'1rem',transform:'translateX(-50%)'

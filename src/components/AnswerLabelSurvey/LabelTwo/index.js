@@ -95,7 +95,7 @@ const checkForProgress=(isDeleted)=>{
 
 
   useEffect(()=>{
-    if(anno && (chosenOption.answers.requireLabelingFlg&&chosenOption.questionType=="radio")){
+    if(anno){
       console.log(chosenOption)
       anno.on('createSelection', async (selection) => {
         selection.body = [{

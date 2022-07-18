@@ -13,9 +13,8 @@ function AnswerLabelSurvey() {
   const [questions,setQuestions]=useState(null)
   const [questionIndex,setQuestionIndex]=useState(0);
   const [surveyResult,setSurveyResult]=useState(null);
-  const [treesRecordId,setTreesRecordId]=useState(null);
+  const [treesId,setTreesId]=useState(null);
   const [currentTree,setCurrentTree]=useState(null)
-  const [currentTreeId,setCurrentTreeId]=useState(null);
   const [treeIndex,setTreeIndex]=useState(0);
   const [treeImages,setTreeImages]=useState(null);
   const [imageIndex,setImageIndex]=useState(0);
@@ -39,7 +38,7 @@ function AnswerLabelSurvey() {
       axios.get(`labelingTaskTrees/findLabelTaskId/${state.labelingTaskId}`)
       .then(response=>{
         const data=response.data.items;
-        setTreesRecordId(
+        setTreesId(
           data.map((item)=>item.treeId)
         );
       })
@@ -47,18 +46,18 @@ function AnswerLabelSurvey() {
   },[state])
 
   useEffect(()=>{
-    if(treesRecordId){
-      axios.get(`tree/${treesRecordId[treeIndex]}`)
+    if(treesId){
+      axios.get(`tree/findByTreeDetectionIdAndTreeId/${state.tdRunId}/${treesId[treeIndex]}`)
       .then(response=>{
-        setCurrentTree(response.data.items);
-        setCurrentTreeId(response.data.items.treeId)
+        setCurrentTree(response.data.items[0]);
+        // setCurrentTreeId(response.data.items.treeId)
       })
     }
-  },[treesRecordId,treeIndex])
+  },[treesId,treeIndex])
 
   useEffect(()=>{
-    if(treesRecordId && state && currentTreeId){
-      axios.get(`treeImage/findByTreeDetectionId/${state.tdRunId}/${currentTreeId}`)
+    if(treesId && state ){
+      axios.get(`treeImage/findByTreeDetectionId/${state.tdRunId}/${treesId[treeIndex]}`)
       .then(response=>{
         setTreeImages(
           response.data.items.map(
@@ -68,7 +67,7 @@ function AnswerLabelSurvey() {
           }
       )
     }
-  },[treesRecordId,treeIndex,currentTreeId])
+  },[treesId,treeIndex])
 
   useEffect(()=>{
     if(state){
@@ -162,25 +161,27 @@ function AnswerLabelSurvey() {
 
   useEffect(()=>{
     if(isSubmitted){
-      if(treeIndex+1 <= treesRecordId.length-1){
-      setReload(!reload);
-      setSavedAnnotations(null)
-      setImageIndex(0);
-      setQuestionIndex(0);
-      setCurrentTreeId(null);
-      setTreeIndex(previous=>previous+1);
-      setCurrentProgress(0)
-      setIsSubmitted(false);
       let labels=[];
       surveyResult.forEach((result)=>{
+        if(result.labels.length){
         labels=[...labels,...result.labels];
+        }
       })
 
       axios.post("labelingResult/saveList",labels)
       .then(response=>console.log(response))
+      if(treeIndex+1 <= treesId.length-1){
+      setReload(!reload);
+      setSavedAnnotations(null)
+      setImageIndex(0);
+      setQuestionIndex(0);
+      setCurrentTree(null);
+      setTreeIndex(previous=>previous+1);
+      setCurrentProgress(0)
+      setIsSubmitted(false);
       }
       else{
-        navigate("/myTasks")
+        navigate("/")
       }
     }
   },[isSubmitted])
@@ -212,7 +213,7 @@ function AnswerLabelSurvey() {
       <table className={styles.table} style={{height:"100vh",}}>
         <thead style={{height:"70px"}} >
           <tr >
-            <th>Tree-{currentTreeId}</th>
+            <th>Tree-{currentTree.treeId}</th>
             <th>
               <div className={styles.progressSubmitContainer} >
                 <div className={styles.progressBar}></div>
@@ -252,7 +253,7 @@ function AnswerLabelSurvey() {
                   labelData={{
                   surveyId:survey.id,questionId:questions[questionIndex].id,
                   imageId:treeImages[imageIndex].imageId,
-                  treeId:currentTreeId,
+                  treeId:currentTree.treeId,
                   visitId:currentTree.visitId,
                   farmId:currentTree.farmId,
                   labelingTaskId:state.labelingTaskId,

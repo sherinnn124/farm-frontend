@@ -22,7 +22,7 @@ function MyTasks() {
   return (
     <>
     {!myTasks?<Loader/>:
-      <div className='container tablecontainer' style={{marginTop:'6rem'}}>
+      <div className='container tablecontainer' style={{marginTop:'4rem'}}>
         <table>
           <thead>
             <tr>
