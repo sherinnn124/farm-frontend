@@ -1,5 +1,5 @@
 import React, { useEffect, useState,useContext} from 'react'
-import { useNavigate,useLocation,Navigate } from 'react-router-dom';
+import { useNavigate,useLocation} from 'react-router-dom';
 import {LabelTwo} from './LabelTwo'
 import Answer from './Answer'
 import styles from './styles.module.css'
@@ -31,6 +31,9 @@ function AnswerLabelSurvey() {
   const navigate=useNavigate();
   const navbar=useContext(navbarContext);
   const state=useLocation().state;
+
+
+
   useEffect(()=>{
     if(state){
       axios.get(`labelingTaskTrees/findLabelTaskId/${state.labelingTaskId}`)
@@ -206,12 +209,12 @@ function AnswerLabelSurvey() {
       {alert.msg}
       </div>}
       {treeImages && savedAnnotations && questions && surveyResult&& currentTree ?
-      <table className={styles.table}>
-        <thead>
-          <tr>
+      <table className={styles.table} style={{height:"100vh",}}>
+        <thead style={{height:"70px"}} >
+          <tr >
             <th>Tree-{currentTreeId}</th>
             <th>
-              <div className={styles.progressSubmitContainer}>
+              <div className={styles.progressSubmitContainer} >
                 <div className={styles.progressBar}></div>
                 <button className='btn' onClick={handleSubmit}>Submit</button>
               </div>
@@ -219,17 +222,25 @@ function AnswerLabelSurvey() {
           </tr>
         </thead>
         <tbody>
-          <tr style={{backgroundColor:"var(--background-color)"}}>
-            <td className={styles.answerTd} style={{width:window.innerWidth*1/4}}>
-              <Answer questionData={{question:questions[questionIndex],questionIndex}} 
-              survey={{surveyResult,setSurveyResult,chosenOptions,setChosenOptions}}
-              progress={{currentProgress,setCurrentProgress,progressIndicator,setProgressIndicator,setTotalProgressNumber}} />
-              <div>
-                <button onClick={()=>setQuestionIndex(changeIndex(questionIndex-1))} className={styles.nav}><MdOutlineNavigateBefore/></button>
-                <button onClick={()=>setQuestionIndex(changeIndex(questionIndex+1))} className={styles.nav}><MdOutlineNavigateNext/></button>
+          <tr style={{backgroundColor:"var(--background-color)"}} >
+            <td className={styles.answerTd} style={{width:window.innerWidth*1/4,height:window.innerHeight-70}}>
+              <div style={{height:"100%",display:"flex",flexDirection:"column",justifyContent:"space-between"}}>
+                <Answer questionData={{question:questions[questionIndex],questionIndex}}
+                survey={{surveyResult,setSurveyResult,chosenOptions,setChosenOptions}}
+                progress={{currentProgress,setCurrentProgress,progressIndicator,setProgressIndicator,setTotalProgressNumber}} />
+                <div style={{display:"flex",justifyContent:"space-between",color:"white",backgroundColor:"var(--main-color)"}}>
+                  <div style={{display:"flex",alignItems:"center"}}>
+                    <button style={{display:"grid",color:"white"}} onClick={()=>setQuestionIndex(changeIndex(questionIndex-1))} className={styles.nav}><MdOutlineNavigateBefore/></button>
+                    <span>Previous Question</span>
+                  </div>
+                  <div style={{display:"flex",alignItems:"center"}}>
+                  <span>Next Question</span>
+                    <button style={{display:"grid",color:"white"}}  onClick={()=>setQuestionIndex(changeIndex(questionIndex+1))} className={styles.nav}><MdOutlineNavigateNext/></button>
+                  </div>
+                </div>
               </div>
             </td>
-            <td className={styles.labelTd} style={{width:window.innerWidth*3/4}}>
+            <td className={styles.labelTd} style={{width:window.innerWidth*3/4,height:window.innerHeight-70}}>
                 <button className={`${styles.nav} ${styles.previous}`} onClick={()=>setImageIndex(changeImageIndex(imageIndex-1))}><MdOutlineNavigateBefore/></button>
                 <button className={`${styles.nav} ${styles.next}`} onClick={()=>setImageIndex(changeImageIndex(imageIndex+1))}><MdOutlineNavigateNext/></button>
                 {treeImages&&

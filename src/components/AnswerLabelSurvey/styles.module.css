@@ -10,13 +10,13 @@
 .answerTd{
   background-color:white;
   border-right: 2px solid var(--main-color);
+  padding: 0;
 }
 .nav{
   background-color: transparent;
   border-color: transparent;
   font-size: 3rem;
   cursor: pointer;
-  color: var(--main-color);
 }
 .table{
   border-collapse: collapse ;

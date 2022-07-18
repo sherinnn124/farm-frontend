@@ -20,9 +20,9 @@ function NewTask() {
     const [mdEnumTreeTypes,setMdEnumTreeTypes]=useState(null)
     const [surveys,setSurveys]=useState(null);
     const [labelers,setLabelers]=useState(null);
-    const [confirmedLabelingTask,setConfirmedLabelingTask]=useState(null);
     const [remaining,setRemaining]=useState(null);
     const [alert,setAlert]=useState({message:'',type:'',show:false});
+    const [assignedLabelingTasks,setAssignedLabelingTasks]=useState([]);
     useEffect(()=>{
         axios.get('mdEnum/findByEnumId/2')
         .then(response=>{
@@ -71,6 +71,7 @@ function NewTask() {
     useEffect(()=>{
         if(selectedTreeTypes && !labelingTasks){
             setLabelingTasks(selectedTreeTypes.map((type)=>[]));
+            setAssignedLabelingTasks(selectedTreeTypes.map((type)=>[]));
             setRemaining(
                 selectedTreeTypes.map(
                     (type)=>({numOfImages:type.numImages,numOfTrees:type.numTrees})
@@ -91,30 +92,42 @@ function NewTask() {
 
 
     const addLabelingTask=(e,i)=>{
-        const arrayTwo=[...labelingTasks]
+        const arrayOne=[...assignedLabelingTasks]
+        arrayOne[i].push(false);
+        setAssignedLabelingTasks(arrayOne)
+        const arrayTwo=[...labelingTasks];
         arrayTwo[i].push(newLabelingTask);
         setLabelingTasks(arrayTwo)
     }
 
-    useEffect(()=>{
-        if(confirmedLabelingTask){
-            axios.post('labelingTask',{...confirmedLabelingTask,treeDetectionRunId:selectedRun.tdRunId})
-            .then(response=>{
-                setConfirmedLabelingTask(null);
-                setAlert({msg:'Task added',type:'success',show:true})
-            })
-            .catch(e=>{
-                setAlert({msg:'Task not assigned',type:'failiure',show:true})
-                setConfirmedLabelingTask(null);
-            })
-        }
-    },[confirmedLabelingTask])
+    const handleConfirmation=async(labelingTask,assignmentData)=>{
+        axios.post('labelingTask',{...labelingTask,treeDetectionRunId:selectedRun.tdRunId})
+        .then(response=>{
+            const array=[...labelingTasks];
+            array[assignmentData.treeTypeIndex][assignmentData.labelingTaskIndex].id=response.data.items.id;
+            setLabelingTasks(array);
+            setAlert({msg:'Task added',type:'success',show:true});
+            const arrayTwo=[...assignedLabelingTasks]
+            arrayTwo[assignmentData.treeTypeIndex][assignmentData.labelingTaskIndex]=true;
+            setAssignedLabelingTasks(arrayTwo)
+        })
+        .catch(e=>{
+            setAlert({msg:'Task not assigned',type:'failiure',show:true})
+        })
+    }
 
 
-    const removeLabeler=(treeTypeIndex,labelingTaskIndex)=>{
-        const array=[...labelingTasks];
-        array[treeTypeIndex].splice(labelingTaskIndex,1);
-        setLabelingTasks(array);
+    const deleteAssignment=async(labelingTaskData)=>{
+        const {taskId,labelingTaskIndex,treeTypeIndex}=labelingTaskData;
+        axios.delete(`labelingTask/${taskId}`)
+        .then(response=>{
+            const array=[...labelingTasks];
+            array[treeTypeIndex].splice(labelingTaskIndex,1);
+            setLabelingTasks(array);
+            const arrayTwo=[...assignedLabelingTasks];
+            arrayTwo[treeTypeIndex].splice(labelingTaskIndex,1);
+            setAssignedLabelingTasks(arrayTwo);
+        })
     }
 
     useEffect(()=>{
@@ -273,8 +286,12 @@ function NewTask() {
                                                     </td>
                                                     <td>-</td>
                                                     <td style={{display:'flex'}}>
-                                                        <button className='action success' onClick={()=>setConfirmedLabelingTask(labelingTasks[index][i])} ><MdOutlineAssignmentTurnedIn/></button>
-                                                        <button className='action remove' onClick={()=>removeLabeler(index,i)} ><IoIosRemoveCircle/></button>
+                                                        {!assignedLabelingTasks[index][i] &&
+                                                            <button className='action success' onClick={()=>handleConfirmation(labelingTasks[index][i],{treeTypeIndex:index,labelingTaskIndex:i})} ><MdOutlineAssignmentTurnedIn/></button>
+                                                        }
+                                                        {assignedLabelingTasks[index][i]&&
+                                                        <button className='action remove' onClick={()=>deleteAssignment({taskId:task.id,treeTypeIndex:index,labelingTaskIndex:i})} ><IoIosRemoveCircle/></button>
+                                                        }
                                                     </td>
                                                 
                                                 </tr>

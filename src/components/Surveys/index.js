@@ -3,24 +3,15 @@ import { useState } from 'react'
 import { useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import { FaEdit,FaTrash} from "react-icons/fa";
-import data from './data'
 import Loader from '../shared/Loader';
 function Surveys() {
     //data should come from backend
     const[surveysData,setSurveysData]=useState([]);
     const [loading,setIsLoading]=useState(true);
-    const [removedSurveyID,setRemovedSurveyId]=useState(null);
+    const [removedSurveyIndex,setRemovedSurveyIndex]=useState(null);
     const navigate=useNavigate();
     
     
-
-
-    const removeSurvey=(id)=>{
-        setSurveysData((previousSurveys)=>previousSurveys.filter((survey)=>survey.id!=id));
-
-        // delete route
-    }
-
     useEffect(()=>{
         axios.get('survey')
         .then(response=>{
@@ -31,15 +22,15 @@ function Surveys() {
     },[])
 
     useEffect(()=>{
-        if(removedSurveyID){
-            axios.delete(`survey/${removedSurveyID}`)
+        if(removedSurveyIndex !=null){
+            axios.delete(`survey/${surveysData[removedSurveyIndex].id}`)
             .then((response)=>{
-                console.log(response)
-                setRemovedSurveyId(null)
+                setRemovedSurveyIndex(null);
+                setSurveysData(surveysData.splice(removedSurveyIndex,1))
             })
             .catch(error=>console.log(error))
         }
-    },[removedSurveyID])
+    },[removedSurveyIndex])
 
   return (
     <>
@@ -61,7 +52,7 @@ function Surveys() {
             <tbody>
             {surveysData.length==0?
             <tr><td colSpan="8">No Surveys Yet</td></tr>:
-                surveysData.map((survey)=>{
+                surveysData.map((survey,index)=>{
                     return(
                     <tr key={survey.id}>
                         <td>{survey.id}</td>
@@ -70,7 +61,7 @@ function Surveys() {
                         <td>{survey.updated}</td>
                         <td style={{display:"flex"}}>
                             <button className='edit action' style={{fontSize:'1rem'}} onClick={()=>navigate(`edit/${survey.id}`,{state:{survey:survey}})}><FaEdit/></button>
-                            <button className='remove action'style={{fontSize:'1rem'}} onClick={()=>setRemovedSurveyId(survey.id)}><FaTrash/></button>
+                            <button className='remove action'style={{fontSize:'1rem'}} onClick={()=>setRemovedSurveyIndex(index)}><FaTrash/></button>
                         </td>
                     </tr>
                     )

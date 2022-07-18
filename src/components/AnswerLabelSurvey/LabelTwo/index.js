@@ -14,6 +14,7 @@ const LabelTwo = ({survey,questionIndex,imageData,savedAnno,progress,labelData})
   const [colors,setColors]=useState(null);
   const {surveyId,questionId,imageId,farmId,treeId,visitId,labelerId,labelingTaskId,tdRunId}=labelData;
 
+
   useEffect(() => {
     if (imageUrl && viewer) {
       viewer.open({
@@ -39,22 +40,22 @@ const LabelTwo = ({survey,questionIndex,imageData,savedAnno,progress,labelData})
         tileRequestHeaders: {
           Authentication: 'Bearer <AUTH_TOKEN>'
         }
-      });    
+      });
     setViewer(initViewer );
     const config = {
       loadTilesWithAjax: true,
       tileRequestHeaders: {
         Authentication: 'Bearer <AUTH_TOKEN>'
       }
-    }; 
+    };
     const annotate = Annotorious(initViewer, config);
     annotate.disableEditor=true;
     annotate.formatters = [ ...annotate.formatters, formatter ]
     annotate.disableSelect=false;
-    setAnno(annotate);  
+    setAnno(annotate);
   };
 
-  
+
 const isInitialMount = useRef(true);
 useEffect(() => {
   if (isInitialMount.current) {
@@ -94,9 +95,9 @@ const checkForProgress=(isDeleted)=>{
 
 
   useEffect(()=>{
-    if(anno){
-
-      anno.on('createSelection', async (selection) => {    
+    if(anno && (chosenOption.answers.requireLabelingFlg&&chosenOption.questionType=="radio")){
+      console.log(chosenOption)
+      anno.on('createSelection', async (selection) => {
         selection.body = [{
           color:colors,
           optionId:survey.chosenOptions[questionIndex].answers.id,
@@ -104,8 +105,8 @@ const checkForProgress=(isDeleted)=>{
         }];
         await anno.updateSelected(selection);
         anno.saveSelected();
-        
-        }); 
+
+        });
 
 
         anno.on('createAnnotation', function(annotation, overrideId) {
@@ -119,7 +120,7 @@ const checkForProgress=(isDeleted)=>{
           arrayTwo[0][imageIndex]=[...arrayTwo[0][imageIndex],annotation];
           savedAnno.setSavedAnnotations(arrayTwo)
           checkForProgress();
-        });  
+        });
 
 
       anno.on('updateAnnotation', async (annotation, previous) => {
@@ -170,7 +171,7 @@ const checkForProgress=(isDeleted)=>{
         anno.disableSelect=false
       });
     }
-  },[anno,questionIndex,imageIndex,progress,colors,survey.chosenOptions])  
+  },[anno,questionIndex,imageIndex,progress,colors,survey.chosenOptions])
 
 
   useEffect(()=>{
@@ -206,8 +207,8 @@ const checkForProgress=(isDeleted)=>{
           anno.off('createAnnotation');
         }
     }
-  },[savedAnno.savedAnnotations,anno,survey.chosenOptions,imageIndex])
-  
+  },[savedAnno.savedAnnotations,anno,survey.chosenOptions,imageIndex,questionIndex])
+
   const isInitialMountTwo = useRef(true);
   useEffect(()=>{
     if (isInitialMountTwo.current) {
@@ -220,16 +221,16 @@ const checkForProgress=(isDeleted)=>{
     }
   },[imageIndex,anno])
 
-  useEffect(() => {   
+  useEffect(() => {
     InitOpenseadragon();
     return () => {
-        viewer && viewer.destroy(); 
-    }; 
+        viewer && viewer.destroy();
+    };
   }, [imageIndex]);
 
   return (
-        <div id="openSeaDragon"style={{height: "100vh",width:"100%"}}></div>   
+        <div id="openSeaDragon"style={{height:"100%",width:"100%"}}></div>
   );
 };
 
-export {LabelTwo} ; 
+export {LabelTwo} ;

@@ -70,8 +70,8 @@ function Answer({questionData,survey,progress}) {
   return (
     <>
       {questionTypes&&
-        <div className={styles.questionContainer}>
-        <h3 className={styles.question}>{mandatoryFlg && <span style={{color:'red'}}>*</span>} {text}</h3>
+        <div className={styles.questionContainer} style={{paddingTop:"3rem"}}>
+        <h2 className={styles.question} >{mandatoryFlg && <span style={{color:'red'}}>*</span>} {text}</h2>
         <div className={styles.answerContainer}>
           {questionTypes[questionTypeId]!=="text"&&
               options.map((option,i)=>{
