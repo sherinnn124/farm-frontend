@@ -26,7 +26,7 @@ function MyTasks() {
         <table>
           <thead>
             <tr>
-              <th>labelerId</th>
+              <th>labeler Id</th>
               <th>Task Id</th>
               <th>treeDetectionRunId</th>
               <th>Survey Id</th>

@@ -53,6 +53,7 @@ table{
   min-width: 100%;
   text-align: left;
   border-radius: 0.25rem 0.25rem 0 0;
+  margin-bottom: 2rem;
   overflow: hidden;
 }
 

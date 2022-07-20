@@ -210,9 +210,9 @@ function AnswerLabelSurvey() {
       {alert.msg}
       </div>}
       {treeImages && savedAnnotations && questions && surveyResult&& currentTree ?
-      <table className={styles.table} style={{height:"100vh",}}>
-        <thead style={{height:"70px"}} >
-          <tr >
+      <table className={styles.table} style={{height:"100%",marginBottom:"0",width:"100%"}}>
+        <thead style={{height:"60px"}} >
+          <tr>
             <th>Tree-{currentTree.treeId}</th>
             <th>
               <div className={styles.progressSubmitContainer} >
@@ -223,8 +223,8 @@ function AnswerLabelSurvey() {
           </tr>
         </thead>
         <tbody>
-          <tr style={{backgroundColor:"var(--background-color)"}} >
-            <td className={styles.answerTd} style={{width:window.innerWidth*1/4,height:window.innerHeight-70}}>
+          <tr style={{backgroundColor:"var(--background-color)",height:"calc(100vh - 60px)"}}  >
+            <td className={styles.answerTd} style={{width:"25%",height:"100%"}}>
               <div style={{height:"100%",display:"flex",flexDirection:"column",justifyContent:"space-between"}}>
                 <Answer questionData={{question:questions[questionIndex],questionIndex}}
                 survey={{surveyResult,setSurveyResult,chosenOptions,setChosenOptions}}
@@ -241,7 +241,7 @@ function AnswerLabelSurvey() {
                 </div>
               </div>
             </td>
-            <td className={styles.labelTd} style={{width:window.innerWidth*3/4,height:window.innerHeight-70}}>
+            <td className={styles.labelTd} style={{height:"100%"}}>
                 <button className={`${styles.nav} ${styles.previous}`} onClick={()=>setImageIndex(changeImageIndex(imageIndex-1))}><MdOutlineNavigateBefore/></button>
                 <button className={`${styles.nav} ${styles.next}`} onClick={()=>setImageIndex(changeImageIndex(imageIndex+1))}><MdOutlineNavigateNext/></button>
                 {treeImages&&
