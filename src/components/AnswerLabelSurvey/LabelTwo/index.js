@@ -96,7 +96,6 @@ const checkForProgress=(isDeleted)=>{
 
   useEffect(()=>{
     if(anno){
-      console.log(chosenOption)
       anno.on('createSelection', async (selection) => {
         selection.body = [{
           color:colors,

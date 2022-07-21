@@ -70,13 +70,13 @@ function Answer({questionData,survey,progress}) {
   return (
     <>
       {questionTypes&&
-        <div className={styles.questionContainer} style={{paddingTop:"3rem"}}>
+        <div className={styles.questionContainer} style={{paddingTop:"3rem",fontFamily:"cairo"}}>
         <h2 className={styles.question} >{mandatoryFlg && <span style={{color:'red'}}>*</span>} {text}</h2>
-        <div className={styles.answerContainer}>
+        <div className={styles.answerContainer} >
           {questionTypes[questionTypeId]!=="text"&&
               options.map((option,i)=>{
                 return(
-                  <div className={styles.multipleChoices} key={i}>
+                  <div className={styles.multipleChoices} key={i} style={{borderRight:option.requireLabelingFlg &&`8px solid #${option.optionColor}`}}>
                   {questionTypes[questionTypeId]=='radio'&&
                     <input type="radio" name={"answerOptionId"} value={option.id} onChange={(e)=>handleChange(e,i)} checked={option.id==survey.surveyResult[questionIndex].answerOptionId[0]}/>
                   }
@@ -84,7 +84,7 @@ function Answer({questionData,survey,progress}) {
                     <input type="checkbox" name={"answerOptionId"} value={option.id} onChange={handleChange} checked={survey.surveyResult[questionIndex].answerOptionId.some((ans)=>ans==option.id)}/>
                   }
                   
-                  <label htmlFor="answerOptionId" className={styles.label} >{option.requireLabelingFlg && <span style={{color:`#${option.optionColor}`}}>*</span>} {option.optionText}</label>
+                  <label htmlFor="answerOptionId" className={styles.label} >{option.optionText}</label>
                   </div>
                 )
               })

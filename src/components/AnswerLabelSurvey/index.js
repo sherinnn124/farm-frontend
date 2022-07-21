@@ -210,7 +210,7 @@ function AnswerLabelSurvey() {
       {alert.msg}
       </div>}
       {treeImages && savedAnnotations && questions && surveyResult&& currentTree ?
-      <table className={styles.table} style={{height:"100%",marginBottom:"0",width:"100%"}}>
+      <table className={styles.table} style={{height:"100%",marginBottom:"0",width:"100%",border:"0",borderRadius:"0"}}>
         <thead style={{height:"60px"}} >
           <tr>
             <th>Tree-{currentTree.treeId}</th>

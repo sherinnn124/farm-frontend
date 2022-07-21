@@ -262,7 +262,8 @@ function NewTask() {
                                                 <tr key={i}>
                                                     <td></td>
                                                     <td><input  name={"numOfTrees"} onFocus={passRemaining} value={labelingTasks[index][i].numOfTrees} onChange={assignInput} onBlur={passRemaining} /></td>
-                                                    <td><input  name={"numOfImages"} onFocus={passRemaining} value={labelingTasks[index][i].numOfImages} onChange={assignInput} onBlur={passRemaining}/></td>
+                                                    <td>-</td>
+                                                    {/* <td><input  name={"numOfImages"} onFocus={passRemaining} value={labelingTasks[index][i].numOfImages} onChange={assignInput} onBlur={passRemaining}/></td> */}
                                                     <td>
                                                         <select name={"surveyId"}  onChange={assignInput} defaultValue={"default"}>
                                                         <option value={"default"} disabled hidden>Select survey</option>
